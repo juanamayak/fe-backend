@@ -1,13 +1,13 @@
 import {Model, DataTypes} from 'sequelize'
 import {database} from '../config/database'
 
-export class CategoryModel extends Model {
+export class CategoryProductModel extends Model {
     public id: number;
     public category_id: number;
     public product_id: number;
 }
 
-CategoryModel.init({
+CategoryProductModel.init({
     id: {
         type: DataTypes.INTEGER.UNSIGNED,
         autoIncrement: true,
