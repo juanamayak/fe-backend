@@ -1,37 +1,33 @@
 import {Model, DataTypes} from 'sequelize'
 import {database} from '../config/database'
 
-export class MessageModel extends Model {
+export class OrderProductModel extends Model {
     public id: number;
-    public user_id: number;
-    public uuid: string;
-    public title: string;
-    public message: string;
-    public status: number;
+    public order_id: number;
+    public product_id: number;
+    public order_number: string;
+    public price: string;
     public createdAt: string;
     public updatedAt: string;
 }
 
-MessageModel.init({
+OrderProductModel.init({
     id: {
         type: DataTypes.INTEGER.UNSIGNED,
         autoIncrement: true,
         primaryKey: true
     },
-    user_id: {
+    order_id: {
         type: DataTypes.INTEGER
     },
-    uuid: {
-        type: DataTypes.STRING
-    },
-    title: {
-        type: DataTypes.STRING
-    },
-    message: {
-        type: DataTypes.STRING
-    },
-    status: {
+    product_id: {
         type: DataTypes.INTEGER
+    },
+    order_number: {
+        type: DataTypes.STRING
+    },
+    price: {
+        type: DataTypes.DECIMAL
     },
     createdAt: {
         type: DataTypes.DATE,
@@ -44,5 +40,5 @@ MessageModel.init({
 }, {
     sequelize: database,
     timestamps: true,
-    tableName: 'messages'
+    tableName: 'order_product'
 });

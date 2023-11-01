@@ -1,14 +1,14 @@
 import {Model, DataTypes} from 'sequelize'
 import {database} from '../config/database'
 
-export class CityModel extends Model {
+export class StateModel extends Model {
     public id: number;
     public country_id: number;
     public country_code: string;
-    public state_id: number;
-    public state_code: string;
     public uuid: string;
     public name: string;
+    public fips_code: string;
+    public iso2: string;
     public latitude: string;
     public longitude: string;
     public flag: number;
@@ -17,7 +17,7 @@ export class CityModel extends Model {
     public updatedAt: string;
 }
 
-CityModel.init({
+StateModel.init({
     id: {
         type: DataTypes.INTEGER.UNSIGNED,
         autoIncrement: true,
@@ -27,12 +27,6 @@ CityModel.init({
         type: DataTypes.INTEGER
     },
     country_code: {
-        type: DataTypes.STRING
-    },
-    state_id: {
-        type: DataTypes.INTEGER
-    },
-    state_code: {
         type: DataTypes.STRING
     },
     uuid: {
@@ -64,5 +58,5 @@ CityModel.init({
 }, {
     sequelize: database,
     timestamps: true,
-    tableName: 'cities'
+    tableName: 'states'
 });

@@ -1,38 +1,28 @@
 import {Model, DataTypes} from 'sequelize'
 import {database} from '../config/database'
 
-export class MessageModel extends Model {
+export class SubcategoryModel extends Model {
     public id: number;
     public user_id: number;
+    public category_id: number;
     public uuid: string;
-    public title: string;
-    public message: string;
+    public name: string;
     public status: number;
     public createdAt: string;
     public updatedAt: string;
 }
 
-MessageModel.init({
+SubcategoryModel.init({
     id: {
         type: DataTypes.INTEGER.UNSIGNED,
         autoIncrement: true,
         primaryKey: true
     },
-    user_id: {
-        type: DataTypes.INTEGER
-    },
-    uuid: {
-        type: DataTypes.STRING
-    },
-    title: {
-        type: DataTypes.STRING
-    },
-    message: {
-        type: DataTypes.STRING
-    },
-    status: {
-        type: DataTypes.INTEGER
-    },
+    user_id: {type: DataTypes.INTEGER},
+    category_id: {type: DataTypes.INTEGER},
+    uuid: {type: DataTypes.STRING},
+    name: {type: DataTypes.STRING},
+    status: {type: DataTypes.INTEGER},
     createdAt: {
         type: DataTypes.DATE,
         allowNull: true
@@ -44,5 +34,5 @@ MessageModel.init({
 }, {
     sequelize: database,
     timestamps: true,
-    tableName: 'messages'
+    tableName: 'subcategories'
 });

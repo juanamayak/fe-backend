@@ -1,38 +1,32 @@
 import {Model, DataTypes} from 'sequelize'
 import {database} from '../config/database'
 
-export class MessageModel extends Model {
+export class UserModel extends Model {
     public id: number;
-    public user_id: number;
+    public role_id: number;
     public uuid: string;
-    public title: string;
-    public message: string;
+    public name: string;
+    public lastname: string;
+    public email: string;
+    public password: string;
     public status: number;
     public createdAt: string;
     public updatedAt: string;
 }
 
-MessageModel.init({
+UserModel.init({
     id: {
         type: DataTypes.INTEGER.UNSIGNED,
         autoIncrement: true,
         primaryKey: true
     },
-    user_id: {
-        type: DataTypes.INTEGER
-    },
-    uuid: {
-        type: DataTypes.STRING
-    },
-    title: {
-        type: DataTypes.STRING
-    },
-    message: {
-        type: DataTypes.STRING
-    },
-    status: {
-        type: DataTypes.INTEGER
-    },
+    role_id: {type: DataTypes.INTEGER},
+    uuid: {type: DataTypes.STRING},
+    name: {type: DataTypes.STRING},
+    lastname: {type: DataTypes.STRING},
+    email: {type: DataTypes.STRING},
+    password: {type: DataTypes.STRING},
+    status: {type: DataTypes.INTEGER},
     createdAt: {
         type: DataTypes.DATE,
         allowNull: true
@@ -44,5 +38,5 @@ MessageModel.init({
 }, {
     sequelize: database,
     timestamps: true,
-    tableName: 'messages'
+    tableName: 'users'
 });
