@@ -5,25 +5,48 @@ import Cryptr from 'cryptr';
 
 export class Payload {
 
-    public createToken(data) {
-        let private_key: any
+    public createToken(data: any) {
+        try {
+            let privateKey: any
 
-        if (process.env.MODE != 'dev') {
-            private_key = fs.readFileSync(process.env.PRIVATE_KEY, 'utf8')
-        } else {
-            private_key = fs.readFileSync('./src/keys/private.pem', 'utf8')
+            if (process.env.MODE !== 'dev') {
+                privateKey = fs.readFileSync(process.env.PRIVATE_KEY || './src/keys/private.pem', 'utf8')
+            } else {
+                privateKey = fs.readFileSync('./src/keys/private.pem', 'utf8')
+            }
+
+            const cryptr = new Cryptr(process.env.CRYPTR_KEY || '')
+
+            if (data.user_type === 'client') {
+                const userId = cryptr.encrypt((data.user_id));
+                const userType = cryptr.encrypt((data.user_type));
+
+                const token = jwt.sign({
+                    userId,
+                    userType
+                }, privateKey, {algorithm: 'RS256', expiresIn: '9h'})
+
+                return {ok: true, token}
+            }
+
+            if (data.user_type === 'administrator') {
+                const administratorId = cryptr.encrypt((data.administrator_id))
+                const role = cryptr.encrypt((data.role))
+                const userType = cryptr.encrypt((data.user_type));
+
+                const token = jwt.sign({
+                    administratorId,
+                    role,
+                    userType
+                }, privateKey, {algorithm: 'RS256', expiresIn: '9h'})
+
+                return {ok: true, token}
+            }
+
+        } catch (e) {
+            console.log(e)
+            return {ok: false}
         }
 
-        let cryptr = new Cryptr(process.env.CRYPTR_KEY)
-
-        const user_id = cryptr.encrypt((data.user_id))
-        const role = cryptr.encrypt((data.role))
-        const room = cryptr.encrypt((data.room))
-
-        return jwt.sign({
-            user_id: user_id,
-            role: role,
-            room: room
-        }, private_key, { algorithm: 'RS256', expiresIn: '9h' })
     }
 }
