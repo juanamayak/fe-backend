@@ -1,6 +1,6 @@
 import validator from 'validator';
 
-export class CategoriesValidator {
+export class SubcategoryValidator {
     public async validateStore(body: any) {
         // Contenedor de errores
         const errors = []
@@ -8,7 +8,10 @@ export class CategoriesValidator {
         try {
             const regex = new RegExp('^[A-Za-zÀ-ú _]*[A-Za-zÀ-ú][A-Za-zÀ-ú _]*$');
 
-            let name: string = !body.name || validator.isEmpty(body.name) ?
+            const category_id: number = !body.category_id || validator.isEmpty(body.category_id) ?
+                errors.push({message: 'La categoría es obligatoria'}) : body.category_id;
+
+            const name: string = !body.name || validator.isEmpty(body.name) ?
                 errors.push({message: 'El nombre es obligatorio'}) : body.name;
 
             if (!regex.test(name)) {
@@ -42,10 +45,13 @@ export class CategoriesValidator {
         try {
             const regex = new RegExp('^[A-Za-zÀ-ú _]*[A-Za-zÀ-ú][A-Za-zÀ-ú _]*$');
 
-            let name: string = !body.name || validator.isEmpty(body.name) ?
+            const category_id: number = !body.category_id || validator.isEmpty(body.category_id) ?
+                errors.push({message: 'La categoría es obligatoria'}) : body.category_id;
+
+            const name: string = !body.name || validator.isEmpty(body.name) ?
                 errors.push({message: 'El nombre es obligatorio'}) : body.name;
 
-            let status: number = !body.status || validator.isEmpty(body.status) ?
+            const status: number = !body.status || validator.isEmpty(body.status) ?
                 errors.push({message: 'El estatus es obligatorio.'}) : body.status;
 
             if (!regex.test(name)) {

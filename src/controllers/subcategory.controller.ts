@@ -4,16 +4,16 @@ import * as bcrypt from 'bcrypt';
 import {v4 as uuidv4} from 'uuid';
 import moment from "moment";
 import {JsonResponse} from '../enums/json-response';
-import {SubcategoriesQueries} from "../queries/subcategories.queries";
-import {SubcategoriesValidator} from "../validators/subcategories.validator";
+import {SubcategoryQueries} from "../queries/subcategory.queries";
+import {SubcategoryValidator} from "../validators/subcategory.validator";
 
-export class SubcategoriesController {
+export class SubcategoryController {
 
-    static subcategoriesQueries: SubcategoriesQueries = new SubcategoriesQueries();
-    static subcategoriesValidator: SubcategoriesValidator = new SubcategoriesValidator();
+    static subcategoriesQueries: SubcategoryQueries = new SubcategoryQueries();
+    static subcategoriesValidator: SubcategoryValidator = new SubcategoryValidator();
 
     public async index(req: Request, res: Response) {
-        let subcategories = await SubcategoriesController.subcategoriesQueries.index();
+        let subcategories = await SubcategoryController.subcategoriesQueries.index();
 
         if (!subcategories.ok) {
             return res.status(JsonResponse.BAD_REQUEST).json({
@@ -34,7 +34,7 @@ export class SubcategoriesController {
         const user_id = req.body.user_id;
 
         // Validacion del request
-        const validatedData = await SubcategoriesController.subcategoriesValidator.validateStore(body)
+        const validatedData = await SubcategoryController.subcategoriesValidator.validateStore(body)
 
         if (!validatedData.ok) {
             return res.status(JsonResponse.BAD_REQUEST).json({
@@ -51,7 +51,7 @@ export class SubcategoriesController {
             status: 1
         }
 
-        const subcategoryCreated = await SubcategoriesController.subcategoriesQueries.create(data)
+        const subcategoryCreated = await SubcategoryController.subcategoriesQueries.create(data)
 
         if (!subcategoryCreated.ok) {
             return res.status(JsonResponse.BAD_REQUEST).json({
@@ -81,7 +81,7 @@ export class SubcategoriesController {
         }
 
         // Validacion del request
-        const validatedData = await SubcategoriesController.subcategoriesValidator.validateUpdate(body);
+        const validatedData = await SubcategoryController.subcategoriesValidator.validateUpdate(body);
 
         if (!validatedData.ok) {
             return res.status(JsonResponse.BAD_REQUEST).json({
@@ -90,7 +90,7 @@ export class SubcategoriesController {
             });
         }
 
-        const subcategory = await SubcategoriesController.subcategoriesQueries.show({
+        const subcategory = await SubcategoryController.subcategoriesQueries.show({
             uuid: subcategoryUuid
         });
 
@@ -107,7 +107,7 @@ export class SubcategoriesController {
             });
         }
 
-        const updateSubcategory = await SubcategoriesController.subcategoriesQueries.update(subcategory.subcategory.id, body);
+        const updateSubcategory = await SubcategoryController.subcategoriesQueries.update(subcategory.subcategory.id, body);
 
         if (!updateSubcategory.subcategory) {
             errors.push({message: 'Existen problemas al momento de actualizar el registro. Intente de nuevamente'});
@@ -139,7 +139,7 @@ export class SubcategoriesController {
             });
         }
 
-        const findedSubcategory = await SubcategoriesController.subcategoriesQueries.show({
+        const findedSubcategory = await SubcategoryController.subcategoriesQueries.show({
             uuid: subcategoryUuid
         });
 
@@ -156,9 +156,9 @@ export class SubcategoriesController {
             });
         }
 
-        const deletedAddress = await SubcategoriesController.subcategoriesQueries.delete(findedSubcategory.subcategory.id, { status: 0});
+        const deletedSubcategory = await SubcategoryController.subcategoriesQueries.delete(findedSubcategory.subcategory.id, { status: 0});
 
-        if (!deletedAddress.ok) {
+        if (!deletedSubcategory.ok) {
             errors.push({message: 'Existen problemas al momento de eliminar el registro. Intente de nuevamente'});
         }
 

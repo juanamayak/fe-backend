@@ -5,10 +5,13 @@ import {JsonResponse} from '../enums/json-response';
 import {v4 as uuidv4} from 'uuid';
 import moment from "moment";
 import {AddressQueries} from "../queries/address.queries";
+import {CitySuggestionValidator} from "../validators/city_suggestion.validator";
+import {AddressValidator} from "../validators/address.validator";
 
 export class AddressController {
 
     static addressesQueries: AddressQueries = new AddressQueries();
+    static addressesValidator: AddressValidator = new AddressValidator();
 
     public async index(req: Request, res: Response) {
         let addresses = await AddressController.addressesQueries.index()
@@ -27,113 +30,59 @@ export class AddressController {
     }
 
     public async store(req: Request, res: Response) {
-        let client_id = req.body.client_id;
-        let body = req.body;
+        const body = req.body;
 
-        let errors = [];
+        const client_id = req.body.client_id;
 
-        let country_id: number = !body.country_id || validator.isEmpty(body.country_id) ?
-            errors.push({message: 'El país es obligatorio'}) : body.country_id;
+        // Validacion del request
+        const validatedData = await AddressController.addressesValidator.validateStore(body)
 
-        let state_id: number = !body.state_id || validator.isEmpty(body.state_id) ?
-            errors.push({message: 'El estado es obligatorio'}) : body.state_id;
-
-        let city_id: number = !body.city_id || validator.isEmpty(body.city_id) ?
-            errors.push({message: 'La ciudad es obligatoria'}) : body.city_id;
-
-        let name_receiver: string = !body.name_receiver || validator.isEmpty(body.name_receiver) ?
-            errors.push({message: 'El nombre del destinatario es obligatorio'}) : body.name_receiver;
-
-        let phone_receiver: string = !body.phone_receiver || validator.isEmpty(body.phone_receiver) ?
-            errors.push({message: 'El número del destinatario es obligatorio'}) : body.phone_receiver;
-
-        let address: string = !body.address || validator.isEmpty(body.address) ?
-            errors.push({message: 'La dirección de entrega es oblitaria'}) : body.address;
-
-        let colony: string = !body.colony || validator.isEmpty(body.colony) ?
-            errors.push({message: 'La colonia de la dirección es oblitaria'}) : body.colony;
-
-        let reference: string = !body.reference || validator.isEmpty(body.reference) ?
-            errors.push({message: 'La referencia es obligatoria'}) : body.reference;
-
-        let latitude: string = !body.latitude || validator.isEmpty(body.latitude) ?
-            errors.push({message: 'La posición en el mapa es obligatorio'}) : body.latitude;
-
-        let longitude: string = !body.longitude || validator.isEmpty(body.longitude) ?
-            errors.push({message: 'La posición en el mapa es obligatorio'}) : body.longitude;
-
-        let zip: number = !body.zip || validator.isEmpty(body.zip) ?
-            errors.push({message: 'El código postal es obligatorio'}) : body.zip;
-
-        if (errors.length > 0) {
+        if (!validatedData.ok) {
             return res.status(JsonResponse.BAD_REQUEST).json({
                 ok: false,
-                errors
+                errors: validatedData.errors
             });
         }
 
-        let createAddress = await AddressController.addressesQueries.create({
+        const data = {
             client_id,
+            country_id: body.country_id,
+            state_id: body.state_id,
+            city_id: body.city_id,
             uuid: uuidv4(),
-            body,
+            name_receiver: body.name_receiver,
+            phone_receiver: body.phone_receiver,
+            address: body.address,
+            colony: body.colony,
+            reference: body.reference,
+            latitude: body.latitude,
+            longitude: body.longitude,
+            zip: body.zip,
             status: 1
-        });
+        }
 
-        if (!createAddress.ok) {
+        let addressCreated = await AddressController.addressesQueries.create(data);
+
+        if (!addressCreated.ok) {
             return res.status(JsonResponse.BAD_REQUEST).json({
                 ok: false,
-                errors: [{message: 'Hubo un error a la hora de crear la dirección. '}]
+                errors: [{ message: "Existen problemas al momento de crear el registro. Intente más tarde."}]
             });
         }
 
         return res.status(JsonResponse.OK).json({
             ok: true,
             message: 'La dirección se creo exitosamente',
-            client: createAddress.address
+            client: addressCreated.address
         });
     }
 
     public async update(req: Request, res: Response) {
-        let client_id = req.body.client_id;
-        let body = req.body;
+        const body = req.body;
+        const errors = [];
 
-        let errors = [];
-
-        let addressUuid = !req.params.uuid || validator.isEmpty(req.params.uuid) ?
-            errors.push({message: 'Favor de proporcionar la dirección.'}) : req.params.uuid
-
-        let country_id: number = !body.country_id || validator.isEmpty(body.country_id) ?
-            errors.push({message: 'El país es obligatorio'}) : body.country_id;
-
-        let state_id: number = !body.state_id || validator.isEmpty(body.state_id) ?
-            errors.push({message: 'El estado es obligatorio'}) : body.state_id;
-
-        let city_id: number = !body.city_id || validator.isEmpty(body.city_id) ?
-            errors.push({message: 'La ciudad es obligatoria'}) : body.city_id;
-
-        let name_receiver: string = !body.name_receiver || validator.isEmpty(body.name_receiver) ?
-            errors.push({message: 'El nombre del destinatario es obligatorio'}) : body.name_receiver;
-
-        let phone_receiver: string = !body.phone_receiver || validator.isEmpty(body.phone_receiver) ?
-            errors.push({message: 'El número del destinatario es obligatorio'}) : body.phone_receiver;
-
-        let address: string = !body.address || validator.isEmpty(body.address) ?
-            errors.push({message: 'La dirección de entrega es oblitaria'}) : body.address;
-
-        let colony: string = !body.colony || validator.isEmpty(body.colony) ?
-            errors.push({message: 'La colonia de la dirección es oblitaria'}) : body.colony;
-
-        let reference: string = !body.reference || validator.isEmpty(body.reference) ?
-            errors.push({message: 'La referencia es obligatoria'}) : body.reference;
-
-        let latitude: string = !body.latitude || validator.isEmpty(body.latitude) ?
-            errors.push({message: 'La posición en el mapa es obligatorio'}) : body.latitude;
-
-        let longitude: string = !body.longitude || validator.isEmpty(body.longitude) ?
-            errors.push({message: 'La posición en el mapa es obligatorio'}) : body.longitude;
-
-        let zip: number = !body.zip || validator.isEmpty(body.zip) ?
-            errors.push({message: 'El código postal es obligatorio'}) : body.zip;
+        const addressUuid = !req.params.uuid || validator.isEmpty(req.params.uuid) ?
+            errors.push({message: 'Favor de proporcionar la dirección'}) : req.params.uuid;
 
         if (errors.length > 0) {
             return res.status(JsonResponse.BAD_REQUEST).json({
@@ -142,14 +91,24 @@ export class AddressController {
             });
         }
 
-        const findedAdress = await AddressController.addressesQueries.show({
+        // Validacion del request
+        const validatedData = await AddressController.addressesValidator.validateUpdate(body);
+
+        if (!validatedData.ok) {
+            return res.status(JsonResponse.BAD_REQUEST).json({
+                ok: false,
+                errors: validatedData.errors
+            });
+        }
+
+        const address = await AddressController.addressesQueries.show({
             uuid: addressUuid
         });
 
-        if (!findedAdress.ok) {
-            errors.push({message: 'Existen problema al buscar la dirección solicitada'});
-        } else if (!findedAdress.address) {
-            errors.push({message: 'La dirección no se encuentra dada de alta'});
+        if (!address.ok) {
+            errors.push({message: 'Existen problemas al buscar el registro solicitado'});
+        } else if (!address.address) {
+            errors.push({message: 'El registro no se encuentra dado de alta'});
         }
 
         if (errors.length > 0) {
@@ -159,8 +118,7 @@ export class AddressController {
             });
         }
 
-
-        const updateAddress = await AddressController.addressesQueries.update(findedAdress.address.id, body);
+        const updateAddress = await AddressController.addressesQueries.update(address.address.id, body);
 
         if (!updateAddress.address) {
             errors.push({message: 'Se encontro un problema a la hora de actualizar la dirección. Intente de nuevamente'});
@@ -173,20 +131,17 @@ export class AddressController {
             });
         }
 
-
         return res.status(JsonResponse.OK).json({
             ok: true,
-            message: 'La dirección se actualizo exitosamente'
+            message: 'El registro se actualizo correctamente'
         });
     }
 
     public async delete(req: Request, res: Response) {
-        let client_id = req.body.client_id;
-        let body = req.body;
+        const body = req.body;
+        const errors = [];
 
-        let errors = [];
-
-        let addressUuid = !req.params.uuid || validator.isEmpty(req.params.uuid) ?
+        const addressUuid = !req.params.uuid || validator.isEmpty(req.params.uuid) ?
             errors.push({message: 'Favor de proporcionar la dirección.'}) : req.params.uuid
 
         if (errors.length > 0) {
@@ -201,9 +156,9 @@ export class AddressController {
         });
 
         if (!findedAdress.ok) {
-            errors.push({message: 'Existen problema al buscar la dirección solicitada'});
+            errors.push({message: 'Existen problema al buscar el registro solicitado'});
         } else if (!findedAdress.address) {
-            errors.push({message: 'La dirección no se encuentra dada de alta'});
+            errors.push({message: 'El registro no se encuentra dada de alta'});
         }
 
         if (errors.length > 0) {
@@ -213,10 +168,10 @@ export class AddressController {
             });
         }
 
-        const deleteAddress = await AddressController.addressesQueries.delete(findedAdress.address.id, { status: 0});
+        const deletedAddress = await AddressController.addressesQueries.delete(findedAdress.address.id, { status: 0});
 
-        if (!deleteAddress.ok) {
-            errors.push({message: 'Se encontro un problema a la hora de eliminar la dirección. Intente de nuevamente'});
+        if (!deletedAddress.ok) {
+            errors.push({message: 'Existen problemas al momento de eliminar el registro. Intente de nuevamente'});
         }
 
         if (errors.length > 0) {
@@ -229,7 +184,7 @@ export class AddressController {
 
         return res.status(JsonResponse.OK).json({
             ok: true,
-            message: 'La dirección se elimino exitosamente'
+            message: 'El registro se elimino correctamente.'
         });
     }
 }

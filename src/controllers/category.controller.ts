@@ -4,17 +4,17 @@ import * as bcrypt from 'bcrypt';
 import {v4 as uuidv4} from 'uuid';
 import moment from "moment";
 import {JsonResponse} from '../enums/json-response';
-import {CategoriesValidator} from "../validators/categories.validator";
-import {CategoriesQueries} from "../queries/categories.queries";
+import {CategoryValidator} from "../validators/category.validator";
+import {CategoryQueries} from "../queries/category.queries";
 
 
-export class CategoriesController {
+export class CategoryController {
 
-    static categoriesQueries: CategoriesQueries = new CategoriesQueries();
-    static categoriesValidator: CategoriesValidator = new CategoriesValidator();
+    static categoriesQueries: CategoryQueries = new CategoryQueries();
+    static categoriesValidator: CategoryValidator = new CategoryValidator();
 
     public async index(req: Request, res: Response) {
-        let categories = await CategoriesController.categoriesQueries.index();
+        let categories = await CategoryController.categoriesQueries.index();
 
         if (!categories.ok) {
             return res.status(JsonResponse.BAD_REQUEST).json({
@@ -35,7 +35,7 @@ export class CategoriesController {
         const user_id = req.body.user_id;
 
         // Validacion del request
-        const validatedData = await CategoriesController.categoriesValidator.validateStore(body)
+        const validatedData = await CategoryController.categoriesValidator.validateStore(body)
 
         if (!validatedData.ok) {
             return res.status(JsonResponse.BAD_REQUEST).json({
@@ -51,7 +51,7 @@ export class CategoriesController {
             status: 1
         }
 
-        const categoryCreated = await CategoriesController.categoriesQueries.create(data)
+        const categoryCreated = await CategoryController.categoriesQueries.create(data)
 
         if (!categoryCreated.ok) {
             return res.status(JsonResponse.BAD_REQUEST).json({
@@ -81,7 +81,7 @@ export class CategoriesController {
         }
 
         // Validacion del request
-        const validatedData = await CategoriesController.categoriesValidator.validateUpdate(body);
+        const validatedData = await CategoryController.categoriesValidator.validateUpdate(body);
 
         if (!validatedData.ok) {
             return res.status(JsonResponse.BAD_REQUEST).json({
@@ -90,7 +90,7 @@ export class CategoriesController {
             });
         }
 
-        const category = await CategoriesController.categoriesQueries.show({
+        const category = await CategoryController.categoriesQueries.show({
             uuid: categoryUuid
         });
 
@@ -107,9 +107,9 @@ export class CategoriesController {
             });
         }
 
-        const updateAddress = await CategoriesController.categoriesQueries.update(category.category.id, body);
+        const updateCategory = await CategoryController.categoriesQueries.update(category.category.id, body);
 
-        if (!updateAddress.category) {
+        if (!updateCategory.category) {
             errors.push({message: 'Existen problemas al momento de actualizar el registro. Intente de nuevamente'});
         }
 
@@ -130,7 +130,7 @@ export class CategoriesController {
         const errors = [];
 
         const categoryUuid = !req.params.uuid || validator.isEmpty(req.params.uuid) ?
-            errors.push({message: 'Favor de proporcionar la dirección.'}) : req.params.uuid
+            errors.push({message: 'Favor de proporcionar la categoría.'}) : req.params.uuid
 
         if (errors.length > 0) {
             return res.status(JsonResponse.BAD_REQUEST).json({
@@ -139,7 +139,7 @@ export class CategoriesController {
             });
         }
 
-        const findedCategory = await CategoriesController.categoriesQueries.show({
+        const findedCategory = await CategoryController.categoriesQueries.show({
             uuid: categoryUuid
         });
 
@@ -156,9 +156,9 @@ export class CategoriesController {
             });
         }
 
-        const deletedAddress = await CategoriesController.categoriesQueries.delete(findedCategory.category.id, { status: 0});
+        const deletedCategory = await CategoryController.categoriesQueries.delete(findedCategory.category.id, { status: 0});
 
-        if (!deletedAddress.ok) {
+        if (!deletedCategory.ok) {
             errors.push({message: 'Existen problemas al momento de eliminar el registro. Intente de nuevamente'});
         }
 

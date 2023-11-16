@@ -1,16 +1,17 @@
 import {Op} from 'sequelize';
+import {SubcategoryModel} from "../models/subcategory.model";
 import {CategoryModel} from "../models/category.model";
 
-export class CategoriesQueries {
+export class SubcategoryQueries {
 
     public async show(data: any) {
         try {
-            const category = await CategoryModel.findOne({
+            const subcategory = await SubcategoryModel.findOne({
                 where: {
                     uuid: data.uuid
                 }
             })
-            return {ok: true, category}
+            return {ok: true, subcategory}
         } catch (e) {
             console.log(e)
             return {ok: false}
@@ -19,8 +20,8 @@ export class CategoriesQueries {
 
     public async index() {
         try {
-            let categories = await CategoryModel.findAll({order: [["createdAt", "ASC"]]})
-            return {ok: true, categories}
+            let subcategories = await SubcategoryModel.findAll({order: [["createdAt", "ASC"]]})
+            return {ok: true, subcategories}
         } catch (e) {
             console.log(e)
             return {ok: false}
@@ -29,35 +30,35 @@ export class CategoriesQueries {
 
     public async create(data) {
         try {
-            let category = await CategoryModel.create(data);
-            return {ok: true, category}
+            let subcategory = await SubcategoryModel.create(data);
+            return {ok: true, subcategory}
         } catch (e) {
             console.log(e)
             return {ok: false}
         }
     }
 
-    public async update(categoryId: any, data: any) {
+    public async update(subcategoryId: any, data: any) {
         try {
-            let category = await CategoryModel.update(
+            let subcategory = await SubcategoryModel.update(
                 data, {
                     where: {
-                        id: categoryId,
+                        id: subcategoryId,
                     }
                 })
-            return {ok: true, category}
+            return {ok: true, subcategory}
         } catch (e) {
             console.log(e)
             return {ok: false}
         }
     }
 
-    public async delete(categoryId: any, data: any) {
+    public async delete(subcategoryId: any, data: any) {
         try {
-            let address = await CategoryModel.update(
+            let subcategory = await SubcategoryModel.update(
                 data, {
                     where: {
-                        id: categoryId,
+                        id: subcategoryId,
                     }
                 })
             return {ok: true}
