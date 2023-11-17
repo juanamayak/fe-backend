@@ -18,8 +18,6 @@ export class CouponValidator {
             const discount_amount: string = !body.name || validator.isEmpty(body.name) ?
                 errors.push({message: 'El nombre es obligatorio'}) : body.name;
 
-            const status: number = !body.status || validator.isEmpty(body.status) ?
-                errors.push({message: 'El estatus es obligatorio.'}) : body.status;
 
             if (errors.length > 0) {
                 return {
@@ -57,6 +55,9 @@ export class CouponValidator {
 
             let discount_amount: string = !body.name || validator.isEmpty(body.name) ?
                 errors.push({message: 'El nombre es obligatorio'}) : body.name;
+
+            const status: number = !body.status || validator.isEmpty(body.status) ?
+                errors.push({message: 'El estatus es obligatorio.'}) : body.status;
 
 
             if (errors.length > 0) {

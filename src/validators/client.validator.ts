@@ -60,9 +60,6 @@ export class ClientValidator {
                 errors.push({message: 'La contraseñas proporcionadas no coinciden'})
             }
 
-            if (validator.isEmail(email) === false) {
-                errors.push({message: 'Favor de respetar la nomenclatura del email.'});
-            }
 
             if (errors.length > 0) {
                 return {
