@@ -5,11 +5,15 @@ import {UserValidator} from "../validators/user.validator";
 import * as bcrypt from 'bcrypt';
 import {v4 as uuidv4} from 'uuid';
 import validator from "validator";
+import {Payload} from "../helpers/payload";
+import {Mailer} from "../helpers/mailer";
 
 export class UsersController {
     static salt = bcrypt.genSaltSync(Number(process.env.NO_SALT));
     static userQueries: UserQueries = new UserQueries();
     static userValidators: UserValidator = new UserValidator();
+    static payload: Payload = new Payload();
+    static mailer: Mailer = new Mailer()
 
     public async store(req: Request, res: Response) {
         const body = req.body;
@@ -107,6 +111,112 @@ export class UsersController {
         return res.status(JsonResponse.OK).json({
             ok: true,
             message: 'El registro se actualizo correctamente'
+        });
+    }
+
+    public async delete(req: Request, res: Response) {
+        const errors = [];
+
+        const userUuid = !req.params.uuid || validator.isEmpty(req.params.uuid) ?
+            errors.push({message: 'Favor de proporcionar el usuario.'}) : req.params.uuid
+
+        if (errors.length > 0) {
+            return res.status(JsonResponse.BAD_REQUEST).json({
+                ok: false,
+                errors
+            });
+        }
+
+        const findedUser = await UsersController.userQueries.show({
+            uuid: userUuid
+        });
+
+        if (!findedUser.ok) {
+            errors.push({message: 'Existen problemas al registro solicitado'});
+        } else if (!findedUser.user) {
+            errors.push({message: 'El registro no se encuentra dado de alta'});
+        }
+
+        if (errors.length > 0) {
+            return res.status(JsonResponse.BAD_REQUEST).json({
+                ok: false,
+                errors
+            });
+        }
+
+        const deletedUser = await UsersController.userQueries.delete(findedUser.user.id, { status: 0});
+
+        if (!deletedUser.ok) {
+            errors.push({message: 'Existen problemas al momento de eliminar el registro. Intente de nuevamente'});
+        }
+
+        if (errors.length > 0) {
+            return res.status(JsonResponse.BAD_REQUEST).json({
+                ok: false,
+                errors
+            });
+        }
+
+        return res.status(JsonResponse.OK).json({
+            ok: true,
+            message: 'El registro se elimino correctamente.'
+        });
+    }
+
+    public async login(req: Request, res: Response) {
+        const body = req.body
+        const errors = [];
+
+        // Validacion del request
+        const validatedData = await UsersController.userValidators.validateLogin(body);
+
+        if (!validatedData.ok) {
+            return res.status(JsonResponse.BAD_REQUEST).json({
+                ok: false,
+                errors: validatedData.errors
+            });
+        }
+
+        const userExists = await UsersController.userQueries.findClientByEmail(body.email);
+
+        if (!userExists.ok || [0, -2].includes(userExists.user.status)) {
+            errors.push({message: 'Existen problemas al momento de verificar si el usuario esta dado de alta.'});
+        } else if (!userExists) {
+            errors.push({message: 'El email proporcionado no se encuentra dado de alta en el sistema.'});
+        } else if (!userExists && !bcrypt.compareSync(body.password, userExists.user.password)) {
+            errors.push({message: 'Las credenciales no coinciden. Intentalo nuevamente.'});
+        }
+
+        if (errors.length > 0) {
+            return res.status(JsonResponse.BAD_REQUEST).json({
+                ok: false,
+                errors
+            });
+        }
+
+        const data = {
+            user_type: 'user',
+            user_id: userExists.user ? userExists.user.id.toString() : false,
+            role_id: userExists.user ? userExists.user.role_id.toString() : false
+        }
+
+        /* Creamos el JWT del cliente */
+        const JWTCreated = await UsersController.payload.createToken(data);
+
+        if (JWTCreated && !JWTCreated.ok) {
+            errors.push({message: 'Existen problemas al momento de crear el token de autenticación.'})
+        }
+
+        if (errors.length > 0) {
+            return res.status(JsonResponse.BAD_REQUEST).json({
+                ok: false,
+                errors
+            });
+        }
+
+        return res.status(JsonResponse.OK).json({
+            ok: true,
+            token: JWTCreated ? JWTCreated.token : false
         });
     }
 }

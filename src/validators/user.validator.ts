@@ -112,4 +112,38 @@ export class UserValidator {
             }
         }
     }
+
+    public async validateLogin(body: any) {
+        const errors = []
+
+        try {
+            const email: string = body.email == null || validator.isEmpty(body.email) ?
+                errors.push({message: 'El correo electrónico es obligatorio'}) : body.email;
+
+            const password: string = body.password == null || validator.isEmpty(body.password) ?
+                errors.push({message: 'La contraseña es obligatoria'}) : body.password;
+
+            if (!validator.isEmail(email)) {
+                errors.push({message: 'Favor de respetar la nomenclatura del email.'})
+            }
+
+            if (errors.length > 0) {
+                return {
+                    ok: false,
+                    errors
+                }
+            }
+
+            return {
+                ok: true
+            }
+        } catch (e) {
+            console.log(e)
+            errors.push({message: 'Error al validar los datos proporcionados'})
+            return {
+                ok: false,
+                errors
+            }
+        }
+    }
 }

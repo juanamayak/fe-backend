@@ -1,6 +1,7 @@
 import {Op} from 'sequelize';
 import {UserModel} from "../models/user.model";
 import {CouponModel} from "../models/coupons.model";
+import {ClientModel} from "../models/client.model";
 
 export class UserQueries {
 
@@ -46,6 +47,35 @@ export class UserQueries {
                         id: userId,
                     }
                 })
+            return {ok: true, user}
+        } catch (e) {
+            console.log(e)
+            return {ok: false}
+        }
+    }
+
+    public async delete(userId: any, data: any) {
+        try {
+            let user = await UserModel.update(
+                data, {
+                    where: {
+                        id: userId,
+                    }
+                });
+            return {ok: true}
+        } catch (e) {
+            console.log(e)
+            return {ok: false}
+        }
+    }
+
+    public async findClientByEmail(email) {
+        try {
+            const user = await UserModel.findOne({
+                where: {
+                    email
+                }
+            });
             return {ok: true, user}
         } catch (e) {
             console.log(e)

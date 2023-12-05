@@ -29,14 +29,15 @@ export class Payload {
                 return {ok: true, token}
             }
 
-            if (data.user_type === 'administrator') {
-                const administratorId = cryptr.encrypt((data.administrator_id))
-                const role = cryptr.encrypt((data.role))
+            if (data.user_type === 'user') {
                 const userType = cryptr.encrypt((data.user_type));
+                const userId = cryptr.encrypt((data.user_id))
+                const roleId = cryptr.encrypt((data.role_id))
+
 
                 const token = jwt.sign({
-                    administratorId,
-                    role,
+                    userId,
+                    roleId,
                     userType
                 }, privateKey, {algorithm: 'RS256', expiresIn: '9h'})
 
