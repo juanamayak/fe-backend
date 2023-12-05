@@ -8,13 +8,13 @@ import {MessageQueries} from "../queries/message.queries";
 import {MessageValidator} from "../validators/message.validator";
 
 
-export class MessagesController {
+export class MessageController {
 
     static messageQueries: MessageQueries = new MessageQueries();
     static messageValidators: MessageValidator = new MessageValidator();
 
     public async index(req: Request, res: Response) {
-        let messages = await MessagesController.messageQueries.index()
+        let messages = await MessageController.messageQueries.index()
 
         if (!messages.ok) {
             return res.status(JsonResponse.BAD_REQUEST).json({
@@ -35,7 +35,7 @@ export class MessagesController {
         const user_id = req.body.user_id;
 
         // Validacion del request
-        const validatedData = await MessagesController.messageValidators.validateStore(body)
+        const validatedData = await MessageController.messageValidators.validateStore(body)
 
         if (!validatedData.ok) {
             return res.status(JsonResponse.BAD_REQUEST).json({
@@ -52,7 +52,7 @@ export class MessagesController {
             status: 1
         }
 
-        const messageCreated = await MessagesController.messageQueries.create(data)
+        const messageCreated = await MessageController.messageQueries.create(data)
 
         if (!messageCreated.ok) {
             return res.status(JsonResponse.BAD_REQUEST).json({
@@ -82,7 +82,7 @@ export class MessagesController {
         }
 
         // Validacion del request
-        const validatedData = await MessagesController.messageValidators.validateUpdate(body);
+        const validatedData = await MessageController.messageValidators.validateUpdate(body);
 
         if (!validatedData.ok) {
             return res.status(JsonResponse.BAD_REQUEST).json({
@@ -91,7 +91,7 @@ export class MessagesController {
             });
         }
 
-        const message = await MessagesController.messageQueries.show({
+        const message = await MessageController.messageQueries.show({
             uuid: messageUuid
         });
 
@@ -108,7 +108,7 @@ export class MessagesController {
             });
         }
 
-        const updatedMessage = await MessagesController.messageQueries.update(message.message.id, body);
+        const updatedMessage = await MessageController.messageQueries.update(message.message.id, body);
 
         if (!updatedMessage.message) {
             errors.push({message: 'Existen problemas al momento de actualizar el registro. Intente de nuevamente'});
