@@ -41,9 +41,9 @@ class App {
      * Strict-Transport-Security,X-Download-Options, X-Content-Type-Options and
      * xssFilter
      */
-    this.app.use(useragent.express())
-    this.app.use(fileUpload())
-    this.app.use(helmet())
+    this.app.use(useragent.express());
+    this.app.use(fileUpload());
+    this.app.use(helmet());
     /** Denega el control de "X-Permitted-Cross-Domain-Policies" */
     this.app.use(helmet.permittedCrossDomainPolicies())
     /** Establecemos nuestras "Referrer Policy" */

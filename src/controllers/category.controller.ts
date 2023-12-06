@@ -35,7 +35,7 @@ export class CategoryController {
         const user_id = req.body.user_id;
 
         // Validacion del request
-        const validatedData = await CategoryController.categoriesValidator.validateStore(body)
+        const validatedData = await CategoryController.categoriesValidator.validateStore(body);
 
         if (!validatedData.ok) {
             return res.status(JsonResponse.BAD_REQUEST).json({
