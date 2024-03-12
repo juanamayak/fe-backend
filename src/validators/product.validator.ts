@@ -6,6 +6,15 @@ export class ProductValidator {
         const errors = []
 
         try {
+            const category_id: number = !body.category_id || validator.isEmpty(body.category_id) ?
+                errors.push({message: 'La categoría es obligatoria.'}) : body.category_id;
+
+            const subcategory_id: number = !body.subcategory_id || validator.isEmpty(body.subcategory_id) ?
+                errors.push({message: 'La subcategoria es obligatoria'}) : body.subcategory_id;
+
+            const provider_id: number = !body.provider_id || validator.isEmpty(body.provider_id) ?
+                errors.push({message: 'El proveedor es obligatorio'}) : body.provider_id;
+
             let name: string = !body.name || validator.isEmpty(body.name) ?
                 errors.push({message: 'El nombre del producto es obligatorio'}) : body.name;
 

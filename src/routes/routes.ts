@@ -25,8 +25,7 @@ export class Routes {
     public usersController: UsersController = new UsersController()
 
     public routes(app: express.Application): void {
-        // Rutas para Usuarios
-
+        // RUTAS DE USUARIOS
         app.route('/api/users/login').post(this.usersController.login)
 
         app.route('/api/products').post(this.productController.store);
