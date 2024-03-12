@@ -3,42 +3,42 @@ import moment from 'moment'
 
 export class File {
     public async upload(data, last_file, type) {
-        /** Validamos y procesamos el archivo proporcionado */
-        if (data.files == null) {
+        const allowedExtensions = ['.jpg', '.jpeg', '.png'];
+
+        if (!data) {
             return {
                 ok: false,
-                message: 'Favor de proporcionar un archivo a procesar'
-            }
-        }
-        else if (!data.files.file) {
-            return {
-                ok: false,
-                message: 'Si desea adjuntar un archivo pdf, es necesario proporcionar uno'
-            }
-        } else if (data.files.file == null) {
-            return {
-                ok: false,
-                message: 'Favor de proporcionar un archivo a procesar'
+                message: 'La imagen del producto es obligatoria'
             }
         }
 
-        if (data.files.file['mimetype'] != 'application/pdf') {
+        const fileName = data.image.name;
+
+
+        // Obtener la extensión del archivo
+        const fileExtension = fileName.toLowerCase().substring(fileName.lastIndexOf('.'));
+
+        if (!allowedExtensions.includes(fileExtension)) {
             return {
                 ok: false,
-                message: 'Favor de proporcionar un archivo con extensión ".pdf"'
+                message: 'El tipo de archivo no es permitido.'
             }
         }
 
-        let size: number = data.files.file['size'];
-        let bytes: number = 1048576;
-        let total_size: number = (size / bytes)
+        const size: number = data.image.size;
+        const bytes: number = 1048576;
+        const totalSize: number = (size / bytes);
 
-        if(total_size > 2.00) {
+        if(totalSize > 2.00) {
             return {
                 ok: false,
-                message: 'Favor de proporcionar un archivo menor o igual a 2 mb.'
+                message: 'La imagen es demasiado pesada. Limite permitido: 2MB'
             }
         }
+
+        /*
+
+
 
         let file: any = data.files.file
         let nameFile: number = moment().unix()
@@ -67,7 +67,7 @@ export class File {
             }
         })
 
-        return { ok: true, nameFile: nameFile + '.pdf' }
+        return { ok: true, nameFile: nameFile + '.pdf' }*/
     }
 
     public async download(name, type) {

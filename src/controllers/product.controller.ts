@@ -15,7 +15,7 @@ import {CategoryValidator} from "../validators/category.validator";
 export class ProductController {
 
     static categoriesQueries: CategoryQueries = new CategoryQueries();
-    static productsValidator: CategoryValidator = new CategoryValidator();
+    static productsValidator: ProductValidator = new ProductValidator();
     static file: File = new File();
 
     public async store(req: Request, res: Response) {
@@ -33,15 +33,13 @@ export class ProductController {
             });
         }
 
-        if (files) {
-            const uploadFile = await ProductController.file.upload(files, null, 'images')
-            if (!uploadFile.ok) {
-                return {
-                    ok: false,
-                    errors: [{message: uploadFile.message}]
-                }
-            }
-
+        const uploadFile = await ProductController.file.upload(files, null, 'images');
+        console.log(uploadFile)
+        if (!uploadFile.ok) {
+            return res.status(JsonResponse.BAD_REQUEST).json({
+                ok: false,
+                errors: uploadFile.message
+            })
         }
 
 
