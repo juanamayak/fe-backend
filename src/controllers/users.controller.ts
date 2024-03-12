@@ -166,6 +166,7 @@ export class UsersController {
     public async login(req: Request, res: Response) {
         const body = req.body
         const errors = [];
+        console.log(body);
 
         // Validacion del request
         const validatedData = await UsersController.userValidators.validateLogin(body);
