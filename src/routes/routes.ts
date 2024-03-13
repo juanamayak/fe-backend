@@ -28,11 +28,15 @@ export class Routes {
         // RUTAS DE USUARIOS
         app.route('/api/users/login').post(this.usersController.login)
 
-        app.route('/api/products').post(this.productController.store);
-
         /* RUTAS DE CLIENTES */
         app.route('/api/clients/register').post(this.clientController.store);
         app.route('/api/clients/login').post(this.clientController.login);
+
+        // RUTAS DE PRODUCTOS
+        app.route('/api/products').get(this.productController.index);
+        app.route('/api/products/create').post(this.productController.store);
+        app.route('/api/products/update').post(this.productController.update);
+        app.route('/api/products/delete').post(this.productController.delete);
 
         /* RUTAS DIRECCIONES */
         app.route('/api/addresses').get(this.addressController.index);

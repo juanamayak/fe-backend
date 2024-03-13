@@ -2,30 +2,25 @@ import fs from 'fs'
 import moment from 'moment'
 
 export class File {
-    public async upload(data, last_file, type) {
+    public async upload(image, imageName, type) {
         const allowedExtensions = ['.jpg', '.jpeg', '.png'];
+        const imageExtension = image.name.toLowerCase().substring(image.name.lastIndexOf('.'));
 
-        if (!data) {
+        if (!image) {
             return {
                 ok: false,
                 message: 'La imagen del producto es obligatoria'
             }
         }
 
-        const fileName = data.image.name;
-
-
-        // Obtener la extensión del archivo
-        const fileExtension = fileName.toLowerCase().substring(fileName.lastIndexOf('.'));
-
-        if (!allowedExtensions.includes(fileExtension)) {
+        if (!allowedExtensions.includes(imageExtension)) {
             return {
                 ok: false,
                 message: 'El tipo de archivo no es permitido.'
             }
         }
 
-        const size: number = data.image.size;
+        const size: number = image.size;
         const bytes: number = 1048576;
         const totalSize: number = (size / bytes);
 
@@ -36,28 +31,21 @@ export class File {
             }
         }
 
-        /*
+        let path: string;
 
-
-
-        let file: any = data.files.file
-        let nameFile: number = moment().unix()
-        let path: string = (type == 'tipo_uno') ? process.env.FILE_PATH :  
-            (type == 'tipo_dos') ? process.env.FILE_PATH : null
-
-        if (last_file != null) {
-            try {
-                fs.unlinkSync(path + last_file);
-            } catch (e) {
-                console.log('Error files a las: ' + moment().format('YYYY-MM-DD HH:mm:ss') + ', ' + e)
+        switch (type) {
+            case 'product':
+                path = process.env.PROD_IMAGES_PATH;
+                break
+            default:
                 return {
                     ok: false,
-                    message: 'Existen problemas al momento de eliminar el archivo anterior'
+                    message: 'Favor de proporcionar un archivo con extensión válida'
                 }
-            }
         }
 
-        file.mv(path + nameFile + '.pdf', function (e) {
+
+        image.mv(path + imageName, function (e) {
             if (e) {
                 console.log('Error files a las: ' + moment().format('YYYY-MM-DD HH:mm:ss') + ', ' + e)
                 return {
@@ -67,7 +55,7 @@ export class File {
             }
         })
 
-        return { ok: true, nameFile: nameFile + '.pdf' }*/
+        return { ok: true, imageName }
     }
 
     public async download(name, type) {

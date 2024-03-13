@@ -1,16 +1,17 @@
 import {Op} from 'sequelize'
-import {ProductModel} from "../models/product.model";
+import {AddressModel} from '../models/address.model'
+import {ImageModel} from "../models/image.mode";
 
-export class ProductQueries {
+export class ImageQueries {
 
     public async show(data: any) {
         try {
-            const product = await ProductModel.findOne({
+            const address = await AddressModel.findOne({
                 where: {
                     uuid: data.uuid
                 }
             })
-            return {ok: true, product}
+            return {ok: true, address}
         } catch (e) {
             console.log(e)
             return {ok: false}
@@ -19,8 +20,8 @@ export class ProductQueries {
 
     public async index() {
         try {
-            let products = await ProductModel.findAll({order: [["createdAt", "ASC"]]})
-            return {ok: true, products}
+            let addresses = await AddressModel.findAll({order: [["createdAt", "ASC"]]})
+            return {ok: true, addresses}
         } catch (e) {
             console.log(e)
             return {ok: false}
@@ -29,35 +30,35 @@ export class ProductQueries {
 
     public async create(data) {
         try {
-            let product = await ProductModel.create(data);
-            return {ok: true, product}
+            let image = await ImageModel.create(data);
+            return {ok: true, image}
         } catch (e) {
             console.log(e)
             return {ok: false}
         }
     }
 
-    public async update(productId: any, data: any) {
+    public async update(addressId: any, data: any) {
         try {
-            let product = await ProductModel.update(
+            let address = await AddressModel.update(
                 data, {
                     where: {
-                        id: productId,
+                        id: addressId,
                     }
                 })
-            return {ok: true, product}
+            return {ok: true, address}
         } catch (e) {
             console.log(e)
             return {ok: false}
         }
     }
 
-    public async delete(productId: any, data: any) {
+    public async delete(addressId: any, data: any) {
         try {
-            let product = await ProductModel.update(
+            let address = await AddressModel.update(
                 data, {
                     where: {
-                        id: productId,
+                        id: addressId,
                     }
                 })
             return {ok: true}
