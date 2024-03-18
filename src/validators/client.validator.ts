@@ -6,15 +6,6 @@ export class ClientValidator {
         const errors = []
 
         try {
-            let country_id: number = !body.country_id || validator.isEmpty(body.country_id) ?
-                errors.push({message: 'El país es obligatorio'}) : body.country_id;
-
-            let state_id: number = !body.state_id || validator.isEmpty(body.state_id) ?
-                errors.push({message: 'El estado es obligatorio'}) : body.state_id;
-
-            let city_id: number = !body.city_id || validator.isEmpty(body.city_id) ?
-                errors.push({message: 'La ciudad es obligatoria'}) : body.city_id;
-
             let name: string = !body.name || validator.isEmpty(body.name) ?
                 errors.push({message: 'El nombre es obligatorio'}) : body.name;
 
@@ -35,8 +26,8 @@ export class ClientValidator {
             let cellphone: string = !body.cellphone || validator.isEmpty(body.cellphone) ?
                 errors.push({message: 'El número celular es obligatorio'}) : body.cellphone;
 
-            let terms_and_conditions: number = !body.terms_and_conditions || validator.isEmpty(body.terms_and_conditions) ?
-                errors.push({message: 'Es necesario aceptar los terminos y condiciones'}) : body.confirm_password;
+            let terms_and_conditions: number = !body.terms_and_conditions ?
+                errors.push({message: 'Es necesario aceptar los terminos y condiciones'}) : body.terms_and_conditions;
 
             const regex = new RegExp('^[A-Za-zÀ-ú _]*[A-Za-zÀ-ú][A-Za-zÀ-ú _]*$');
 

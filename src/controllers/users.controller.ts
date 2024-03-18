@@ -3,6 +3,7 @@ import {JsonResponse} from "../enums/json-response";
 import {UserQueries} from "../queries/user.queries";
 import {UserValidator} from "../validators/user.validator";
 import * as bcrypt from 'bcrypt';
+import PasswordGenerator from 'generate-password';
 import {v4 as uuidv4} from 'uuid';
 import validator from "validator";
 import {Payload} from "../helpers/payload";
@@ -13,7 +14,23 @@ export class UsersController {
     static userQueries: UserQueries = new UserQueries();
     static userValidators: UserValidator = new UserValidator();
     static payload: Payload = new Payload();
-    static mailer: Mailer = new Mailer()
+    static mailer: Mailer = new Mailer();
+
+    public async index(req: Request, res: Response) {
+        let users = await UsersController.userQueries.index();
+
+        if (!users.ok) {
+            return res.status(JsonResponse.BAD_REQUEST).json({
+                ok: false,
+                errors: [{message: 'Ocurrio un error al obtener los registros.'}]
+            });
+        }
+
+        return res.status(JsonResponse.OK).json({
+            ok: true,
+            users: users.users,
+        });
+    }
 
     public async store(req: Request, res: Response) {
         const body = req.body;
@@ -30,13 +47,18 @@ export class UsersController {
             });
         }
 
+        const tempPassword = PasswordGenerator.generate({
+            length: 10,
+            numbers: true
+        });
+
         const data = {
             uuid: uuidv4(),
             role_id: body.role_id,
             name: body.name,
             lastname: body.lastname,
             email: body.email,
-            password: bcrypt.hashSync(body.password, UsersController.salt),
+            password: bcrypt.hashSync(tempPassword, UsersController.salt),
             status: 1
         }
 
@@ -45,9 +67,12 @@ export class UsersController {
         if (!userCreated.ok) {
             return res.status(JsonResponse.BAD_REQUEST).json({
                 ok: false,
-                errors: [{ message: "Existen problemas al momento de dar de alta el registro. Intente más tarde"}]
+                errors: [{message: "Existen problemas al momento de dar de alta el registro. Intente más tarde"}]
             });
         }
+
+        // TODO: Log de la creación de usuarios
+        // TODO: Envio de correo electrónico al usuario nuevo
 
         return res.status(JsonResponse.OK).json({
             ok: true,
@@ -114,6 +139,56 @@ export class UsersController {
         });
     }
 
+    public async status(req: Request, res: Response) {
+        const status = req.body.status
+        const errors = [];
+
+        const userUuid = !req.params.uuid || validator.isEmpty(req.params.uuid) ?
+            errors.push({message: 'Favor de proporcionar el usuario.'}) : req.params.uuid
+
+        if (errors.length > 0) {
+            return res.status(JsonResponse.BAD_REQUEST).json({
+                ok: false,
+                errors
+            });
+        }
+
+        const findedUser = await UsersController.userQueries.show({
+            uuid: userUuid
+        });
+
+        if (!findedUser.ok) {
+            errors.push({message: 'Existen problemas al registro solicitado'});
+        } else if (!findedUser.user) {
+            errors.push({message: 'El registro no se encuentra dado de alta'});
+        }
+
+        if (errors.length > 0) {
+            return res.status(JsonResponse.BAD_REQUEST).json({
+                ok: false,
+                errors
+            });
+        }
+
+        const updatedStatus = await UsersController.userQueries.status(findedUser.user.id, {status: status});
+
+        if (!updatedStatus.ok) {
+            errors.push({message: 'Existen problemas al momento de actualizar el registro. Intente de nuevamente'});
+        }
+
+        if (errors.length > 0) {
+            return res.status(JsonResponse.BAD_REQUEST).json({
+                ok: false,
+                errors
+            });
+        }
+
+        return res.status(JsonResponse.OK).json({
+            ok: true,
+            message: 'El registro se actualizo correctamente.'
+        });
+    }
+
     public async delete(req: Request, res: Response) {
         const errors = [];
 
@@ -144,7 +219,7 @@ export class UsersController {
             });
         }
 
-        const deletedUser = await UsersController.userQueries.delete(findedUser.user.id, { status: 0});
+        const deletedUser = await UsersController.userQueries.delete(findedUser.user.id, {status: -2});
 
         if (!deletedUser.ok) {
             errors.push({message: 'Existen problemas al momento de eliminar el registro. Intente de nuevamente'});
@@ -166,7 +241,6 @@ export class UsersController {
     public async login(req: Request, res: Response) {
         const body = req.body
         const errors = [];
-        console.log(body);
 
         // Validacion del request
         const validatedData = await UsersController.userValidators.validateLogin(body);

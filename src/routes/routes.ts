@@ -26,23 +26,15 @@ export class Routes {
 
     public routes(app: express.Application): void {
         // RUTAS DE USUARIOS
-        app.route('/api/users/login').post(this.usersController.login)
+        app.route('/api/users').get(this.usersController.index);
+        app.route('/api/users/login').post(this.usersController.login);
+        app.route('/api/users/create').post(this.usersController.store);
+        app.route('/api/users/status/:uuid').get(this.usersController.status);
+        app.route('/api/users/delete/:uuid').put(this.usersController.delete);
 
         /* RUTAS DE CLIENTES */
         app.route('/api/clients/register').post(this.clientController.store);
         app.route('/api/clients/login').post(this.clientController.login);
-
-        // RUTAS DE PRODUCTOS
-        app.route('/api/products').get(this.productController.index);
-        app.route('/api/products/create').post(this.productController.store);
-        app.route('/api/products/update').post(this.productController.update);
-        app.route('/api/products/delete').post(this.productController.delete);
-
-        /* RUTAS DIRECCIONES */
-        app.route('/api/addresses').get(this.addressController.index);
-        app.route('/api/addresses/create').post(this.addressController.store);
-        app.route('/api/addresses/update').post(this.addressController.update);
-        app.route('/api/addresses/delete').post(this.addressController.delete);
 
         /* RUTAS DE CATEGORIAS */
         app.route('/api/categories').get(this.categoryController.index);
@@ -68,10 +60,34 @@ export class Routes {
         app.route('/api/hours/update').post(this.deliveryHourController.update);
         app.route('/api/hours/delete').post(this.deliveryHourController.delete);
 
+        // RUTAS DE PAISES
+        // RUTAS DE ESTADOS
+        // RUTAS DE CIUDADES
+
+        // RUTAS DE PRODUCTOS
+        app.route('/api/products').get(this.productController.index);
+        app.route('/api/products/create').post(this.productController.store);
+        app.route('/api/products/update').post(this.productController.update);
+        app.route('/api/products/delete').post(this.productController.delete);
+
         /* RUTAS DE PROVEEDORES  */
         app.route('/api/providers').get(this.providerController.index);
         app.route('/api/providers/create').post(this.providerController.store);
         app.route('/api/providers/update').post(this.providerController.update);
         app.route('/api/providers/delete').post(this.providerController.delete);
+
+        /* RUTAS DIRECCIONES */
+        app.route('/api/addresses').get(this.addressController.index);
+        app.route('/api/addresses/create').post(this.addressController.store);
+        app.route('/api/addresses/update').post(this.addressController.update);
+        app.route('/api/addresses/delete').post(this.addressController.delete);
+
+        // RUTAS DE COSTOS DE ENVÍO
+
+        // RUTAS DE CARRITO DE COMPRAS
+
+        // RUTAS DE ORDENES
+
+        // RUTAS DE ROLES
     }
 }

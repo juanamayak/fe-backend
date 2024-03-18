@@ -54,6 +54,21 @@ export class UserQueries {
         }
     }
 
+    public async status(userId: any, data: any) {
+        try {
+            let user = await UserModel.update(
+                data, {
+                    where: {
+                        id: userId,
+                    }
+                });
+            return {ok: true}
+        } catch (e) {
+            console.log(e)
+            return {ok: false}
+        }
+    }
+
     public async delete(userId: any, data: any) {
         try {
             let user = await UserModel.update(

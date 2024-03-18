@@ -30,18 +30,12 @@ export class ClientController {
         }
 
         const data = {
-            country_id: body.country_id,
-            state_id: body.state_id,
-            city_id: body.city_id,
             uuid: uuidv4(),
-            greeting: body.greeting,
             name: body.name,
             lastname: body.lastname,
             email: body.email,
             password: bcrypt.hashSync(body.password, ClientController.salt),
-            birthday: body.birthday,
             cellphone: body.cellphone,
-            newsletter: body.newsletter,
             terms_and_conditions: body.terms_and_conditions,
             status: 1
         }
