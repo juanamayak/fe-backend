@@ -25,7 +25,7 @@ export class CategoryController {
 
         return res.status(JsonResponse.OK).json({
             ok: true,
-            countries: categories.categories,
+            categories: categories.categories,
         });
     }
 

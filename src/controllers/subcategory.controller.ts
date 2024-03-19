@@ -24,7 +24,7 @@ export class SubcategoryController {
 
         return res.status(JsonResponse.OK).json({
             ok: true,
-            countries: subcategories.subcategories,
+            subcategories: subcategories.subcategories,
         });
     }
 

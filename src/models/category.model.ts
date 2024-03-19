@@ -37,5 +37,5 @@ CategoryModel.init({
 }, {
     sequelize: database,
     timestamps: true,
-    tableName: 'carts'
+    tableName: 'categories'
 });

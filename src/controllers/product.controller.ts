@@ -38,7 +38,7 @@ export class ProductController {
 
         return res.status(JsonResponse.OK).json({
             ok: true,
-            countries: products.products,
+            products: products.products,
         })
     }
 
