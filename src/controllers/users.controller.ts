@@ -219,7 +219,7 @@ export class UsersController {
             });
         }
 
-        const deletedUser = await UsersController.userQueries.delete(findedUser.user.id, {status: -2});
+        const deletedUser = await UsersController.userQueries.delete(findedUser.user.id, {status: -1});
 
         if (!deletedUser.ok) {
             errors.push({message: 'Existen problemas al momento de eliminar el registro. Intente de nuevamente'});

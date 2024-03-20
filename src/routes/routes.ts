@@ -29,7 +29,7 @@ export class Routes {
         app.route('/api/users').get(this.usersController.index);
         app.route('/api/users/login').post(this.usersController.login);
         app.route('/api/users/create').post(this.usersController.store);
-        app.route('/api/users/status/:uuid').get(this.usersController.status);
+        app.route('/api/users/status/:uuid').put(this.usersController.status);
         app.route('/api/users/delete/:uuid').put(this.usersController.delete);
 
         /* RUTAS DE CLIENTES */

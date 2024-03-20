@@ -21,7 +21,10 @@ export class UserQueries {
 
     public async index() {
         try {
-            let users = await UserModel.findAll({order: [["createdAt", "ASC"]]})
+            let users = await UserModel.findAll(
+                {
+                    order: [["createdAt", "ASC"]],
+                });
             return {ok: true, users}
         } catch (e) {
             console.log(e)
