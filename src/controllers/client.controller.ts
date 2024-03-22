@@ -14,7 +14,23 @@ export class ClientController {
     static clientQueries: ClientQueries = new ClientQueries();
     static clientValidator: ClientValidator = new ClientValidator();
     static payload: Payload = new Payload();
-    static mailer: Mailer = new Mailer()
+    static mailer: Mailer = new Mailer();
+
+    public async index(req: Request, res: Response) {
+        let clients = await ClientController.clientQueries.index()
+
+        if (!clients.ok) {
+            return res.status(JsonResponse.BAD_REQUEST).json({
+                ok: false,
+                errors: [{message: 'Algo salio mal a la hora de traer los productos.'}]
+            });
+        }
+
+        return res.status(JsonResponse.OK).json({
+            ok: true,
+            clients: clients.clients,
+        })
+    }
 
     public async store(req: Request, res: Response) {
         const body = req.body;

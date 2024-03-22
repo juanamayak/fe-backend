@@ -33,8 +33,9 @@ export class Routes {
         app.route('/api/users/delete/:uuid').put(this.usersController.delete);
 
         /* RUTAS DE CLIENTES */
-        app.route('/api/clients/register').post(this.clientController.store);
+        app.route('/api/clients').get(this.clientController.index);
         app.route('/api/clients/login').post(this.clientController.login);
+        app.route('/api/clients/register').post(this.clientController.store);
 
         /* RUTAS DE CATEGORIAS */
         app.route('/api/categories').get(this.categoryController.index);
@@ -48,7 +49,7 @@ export class Routes {
         app.route('/api/subcategories/update').post(this.subcategoryController.update);
         app.route('/api/subcategories/delete').post(this.subcategoryController.delete);
 
-        /* RUTAS DE CATEGORIAS */
+        /* RUTAS DE CUPONES */
         // app.route('/api/coupons').get(this.couponController.index);
         app.route('/api/coupons/create').post(this.couponController.store);
         app.route('/api/coupons/update').post(this.couponController.update);

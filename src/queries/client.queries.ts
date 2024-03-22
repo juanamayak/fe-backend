@@ -1,6 +1,7 @@
 import {Op} from 'sequelize'
 import {AddressModel} from '../models/address.model'
 import {ClientModel} from "../models/client.model";
+import {ClientController} from "../controllers/client.controller";
 
 export class ClientQueries {
 
@@ -20,8 +21,8 @@ export class ClientQueries {
 
     public async index() {
         try {
-            let addresses = await AddressModel.findAll({order: [["createdAt", "ASC"]]})
-            return {ok: true, addresses}
+            let clients = await ClientModel.findAll({order: [["createdAt", "ASC"]]})
+            return {ok: true, clients}
         } catch (e) {
             console.log(e)
             return {ok: false}
