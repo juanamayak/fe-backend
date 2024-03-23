@@ -22,8 +22,8 @@ export class Payload {
                 const userType = cryptr.encrypt((data.user_type));
 
                 const token = jwt.sign({
-                    userId,
-                    userType
+                    user_id: userId,
+                    user_type: userType
                 }, privateKey, {algorithm: 'RS256', expiresIn: '9h'})
 
                 return {ok: true, token}
@@ -36,9 +36,9 @@ export class Payload {
 
 
                 const token = jwt.sign({
-                    userId,
-                    roleId,
-                    userType
+                    user_id: userId,
+                    role_id: roleId,
+                    user_type: userType
                 }, privateKey, {algorithm: 'RS256', expiresIn: '9h'})
 
                 return {ok: true, token}

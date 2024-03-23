@@ -6,7 +6,7 @@ import { Response, Request, NextFunction } from 'express'
 
 export class CheckHeaders {
     /** Este middleware valida que la cabecera de autenticación sea correcta */
-    static validateJWT(req: Request, res: Response, next: NextFunction) {
+    static validateJWTUser(req: Request, res: Response, next: NextFunction) {
         /* Obtenemos la cabecera de autenticación */
         let token = req.get('Authorization')
         let public_key
@@ -35,12 +35,8 @@ export class CheckHeaders {
 
             /*Desencriptamos información deseada del usuario*/
             let user_id = cryptr.decrypt(decoded.user_id)
-            let role = cryptr.decrypt(decoded.role)
-            let room = cryptr.decrypt(decoded.room)
             /*Retornamos el id del usuario decodificado junto con el token */
             req.body.user_id = +user_id
-            req.body.role = +role
-            req.body.room = +room
         } catch (e) {
             /*Cachamos los errores posibles*/
             return res.status(403).json({

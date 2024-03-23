@@ -14,6 +14,8 @@ import {OrderModel} from "../models/order.model";
 import {CouponModel} from "../models/coupons.model";
 import {ProductModel} from "../models/product.model";
 import {PaymentMethodModel} from "../models/payment_method.model";
+import {CategoryModel} from "../models/category.model";
+import {SubcategoryModel} from "../models/subcategory.model";
 
 export default class Relationship {
     static init() {
@@ -22,18 +24,22 @@ export default class Relationship {
          */
 
 
+        // RELACIONES DE CATEGORIAS
+
+        CategoryModel.hasMany(SubcategoryModel, {foreignKey: 'category_id', as: 'subcategories'});
+
         /* Relaciones de Clients */
-        ClientModel.hasMany(CartModel, { foreignKey: 'client_id' });
-        CartModel.belongsTo(ClientModel, { foreignKey: 'client_id' });
+        ClientModel.hasMany(CartModel, {foreignKey: 'client_id'});
+        CartModel.belongsTo(ClientModel, {foreignKey: 'client_id'});
 
-        ClientModel.hasMany(AddressModel, { foreignKey: 'client_id' });
-        AddressModel.belongsTo(ClientModel, { foreignKey: 'client_id' });
+        ClientModel.hasMany(AddressModel, {foreignKey: 'client_id'});
+        AddressModel.belongsTo(ClientModel, {foreignKey: 'client_id'});
 
-        ClientModel.hasMany(CitySuggestionModel, { foreignKey: 'client_id' });
-        CitySuggestionModel.belongsTo(ClientModel, { foreignKey: 'client_id' });
+        ClientModel.hasMany(CitySuggestionModel, {foreignKey: 'client_id'});
+        CitySuggestionModel.belongsTo(ClientModel, {foreignKey: 'client_id'});
 
-        ClientModel.hasMany(OrderModel, { foreignKey: 'client_id' });
-        OrderModel.belongsTo(ClientModel, { foreignKey: 'client_id' });
+        ClientModel.hasMany(OrderModel, {foreignKey: 'client_id'});
+        OrderModel.belongsTo(ClientModel, {foreignKey: 'client_id'});
 
         ClientModel.belongsToMany(OrderModel, {through: 'ClientOrderCouponModel', foreignKey: 'client_id'});
         OrderModel.belongsToMany(ClientModel, {through: 'ClientOrderCouponModel', foreignKey: 'order_id'});
@@ -41,8 +47,8 @@ export default class Relationship {
         CouponModel.belongsToMany(ClientModel, {through: 'ClientOrderCouponModel', foreignKey: 'coupon_id'});
 
         /* Relaciones de Carts */
-        CartModel.belongsToMany(ProductModel, {through: 'CartProduct', foreignKey:'cart_id'})
-        ProductModel.belongsToMany(CartModel, {through: 'CartProduct', foreignKey:'product_id'})
+        CartModel.belongsToMany(ProductModel, {through: 'CartProduct', foreignKey: 'cart_id'})
+        ProductModel.belongsToMany(CartModel, {through: 'CartProduct', foreignKey: 'product_id'})
 
 
     }

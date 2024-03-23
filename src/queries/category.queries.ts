@@ -1,5 +1,6 @@
 import {Op} from 'sequelize';
 import {CategoryModel} from "../models/category.model";
+import {SubcategoryModel} from "../models/subcategory.model";
 
 export class CategoryQueries {
 
@@ -19,7 +20,17 @@ export class CategoryQueries {
 
     public async index() {
         try {
-            let categories = await CategoryModel.findAll({order: [["createdAt", "ASC"]]})
+            let categories = await CategoryModel.findAll(
+                {
+                    where: {
+                        status: [0, 1]
+                    },
+                    order: [["createdAt", "ASC"]],
+                    include: [{
+                        model: SubcategoryModel,
+                        as: 'subcategories'
+                    }]
+                })
             return {ok: true, categories}
         } catch (e) {
             console.log(e)

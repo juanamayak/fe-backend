@@ -39,13 +39,13 @@ export class Routes {
 
         /* RUTAS DE CATEGORIAS */
         app.route('/api/categories').get(this.categoryController.index);
-        app.route('/api/categories/create').post(this.categoryController.store);
+        app.route('/api/categories/create').post(CheckHeaders.validateJWTUser, this.categoryController.store);
         app.route('/api/categories/update').post(this.categoryController.update);
-        app.route('/api/categories/delete').post(this.categoryController.delete);
+        app.route('/api/categories/delete/:uuid').put(this.categoryController.delete);
 
         /* RUTAS DE SUBCATEGORIES */
         app.route('/api/subcategories').get(this.subcategoryController.index);
-        app.route('/api/subcategories/create').post(this.subcategoryController.store);
+        app.route('/api/subcategories/create').post(CheckHeaders.validateJWTUser, this.subcategoryController.store);
         app.route('/api/subcategories/update').post(this.subcategoryController.update);
         app.route('/api/subcategories/delete').post(this.subcategoryController.delete);
 

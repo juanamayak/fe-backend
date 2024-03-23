@@ -23,6 +23,9 @@ CategoryModel.init({
     uuid: {
         type: DataTypes.STRING
     },
+    name: {
+        type: DataTypes.STRING
+    },
     status: {
         type: DataTypes.INTEGER
     },

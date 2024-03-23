@@ -31,7 +31,6 @@ export class CategoryController {
 
     public async store(req: Request, res: Response) {
         const body = req.body;
-
         const user_id = req.body.user_id;
 
         // Validacion del request
@@ -156,7 +155,7 @@ export class CategoryController {
             });
         }
 
-        const deletedCategory = await CategoryController.categoriesQueries.delete(findedCategory.category.id, { status: 0});
+        const deletedCategory = await CategoryController.categoriesQueries.delete(findedCategory.category.id, { status: -1});
 
         if (!deletedCategory.ok) {
             errors.push({message: 'Existen problemas al momento de eliminar el registro. Intente de nuevamente'});
