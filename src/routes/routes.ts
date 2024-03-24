@@ -12,6 +12,7 @@ import {CouponController} from "../controllers/coupon.controller";
 import {DeliveryHourController} from "../controllers/delivery_hour.controller";
 import {ProviderController} from "../controllers/provider.controller";
 import {SubcategoryController} from "../controllers/subcategory.controller";
+import {LocationsController} from "../controllers/locations.controller";
 
 export class Routes {
     public addressController: AddressController = new AddressController()
@@ -23,6 +24,7 @@ export class Routes {
     public subcategoryController: SubcategoryController = new SubcategoryController()
     public clientController: ClientController = new ClientController()
     public usersController: UsersController = new UsersController()
+    public locationsController: LocationsController = new LocationsController()
 
     public routes(app: express.Application): void {
         // RUTAS DE USUARIOS
@@ -47,7 +49,7 @@ export class Routes {
         app.route('/api/subcategories').get(this.subcategoryController.index);
         app.route('/api/subcategories/create').post(CheckHeaders.validateJWTUser, this.subcategoryController.store);
         app.route('/api/subcategories/update').post(this.subcategoryController.update);
-        app.route('/api/subcategories/delete').post(this.subcategoryController.delete);
+        app.route('/api/subcategories/delete/:uuid').put(this.subcategoryController.delete);
 
         /* RUTAS DE CUPONES */
         // app.route('/api/coupons').get(this.couponController.index);
@@ -61,9 +63,10 @@ export class Routes {
         app.route('/api/hours/update').post(this.deliveryHourController.update);
         app.route('/api/hours/delete').post(this.deliveryHourController.delete);
 
-        // RUTAS DE PAISES
-        // RUTAS DE ESTADOS
-        // RUTAS DE CIUDADES
+        // RUTAS DE LOCALIDADES
+        app.route('/api/countries').get(this.locationsController.countries);
+        app.route('/api/states/:country_id').get(this.locationsController.states);
+        app.route('/api/cities/:state_id').get(this.locationsController.cities);
 
         // RUTAS DE PRODUCTOS
         app.route('/api/products').get(this.productController.index);
@@ -73,7 +76,7 @@ export class Routes {
 
         /* RUTAS DE PROVEEDORES  */
         app.route('/api/providers').get(this.providerController.index);
-        app.route('/api/providers/create').post(this.providerController.store);
+        app.route('/api/providers/create').post(CheckHeaders.validateJWTUser, this.providerController.store);
         app.route('/api/providers/update').post(this.providerController.update);
         app.route('/api/providers/delete').post(this.providerController.delete);
 

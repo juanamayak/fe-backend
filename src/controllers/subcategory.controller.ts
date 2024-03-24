@@ -156,7 +156,7 @@ export class SubcategoryController {
             });
         }
 
-        const deletedSubcategory = await SubcategoryController.subcategoriesQueries.delete(findedSubcategory.subcategory.id, { status: 0});
+        const deletedSubcategory = await SubcategoryController.subcategoriesQueries.delete(findedSubcategory.subcategory.id, { status: -1});
 
         if (!deletedSubcategory.ok) {
             errors.push({message: 'Existen problemas al momento de eliminar el registro. Intente de nuevamente'});
