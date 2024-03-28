@@ -149,13 +149,13 @@ export class ProviderController {
             });
         }
 
-        const findedAdress = await ProviderController.providerQueries.show({
+        const findedProvider = await ProviderController.providerQueries.show({
             uuid: providerUuid
         });
 
-        if (!findedAdress.ok) {
+        if (!findedProvider.ok) {
             errors.push({message: 'Existen problema al buscar el registro solicitado'});
-        } else if (!findedAdress.provider) {
+        } else if (!findedProvider.provider) {
             errors.push({message: 'El registro no se encuentra dada de alta'});
         }
 
@@ -166,9 +166,9 @@ export class ProviderController {
             });
         }
 
-        const deletedAddress = await ProviderController.providerQueries.delete(findedAdress.provider.id, { status: 0});
+        const deletedProvider = await ProviderController.providerQueries.delete(findedProvider.provider.id, { status: body.status});
 
-        if (!deletedAddress.ok) {
+        if (!deletedProvider.ok) {
             errors.push({message: 'Existen problemas al momento de eliminar el registro. Intente de nuevamente'});
         }
 

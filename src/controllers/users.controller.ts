@@ -52,6 +52,8 @@ export class UsersController {
             numbers: true
         });
 
+        console.log(tempPassword);
+
         const data = {
             uuid: uuidv4(),
             role_id: body.role_id,

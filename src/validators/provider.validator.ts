@@ -74,8 +74,8 @@ export class ProviderValidator {
             const city_id: number = !body.city_id ?
                 errors.push({message: 'La ciudad es obligatoria'}) : body.city_id;
 
-            const name: string = !body.name_receiver || validator.isEmpty(body.name_receiver) ?
-                errors.push({message: 'El nombre del destinatario es obligatorio'}) : body.name_receiver;
+            const name: string = !body.name || validator.isEmpty(body.name) ?
+                errors.push({message: 'El nombre del proveedor es obligatorio'}) : body.name;
 
             const address: string = !body.address || validator.isEmpty(body.address) ?
                 errors.push({message: 'La dirección de entrega es oblitaria'}) : body.address;
@@ -97,9 +97,6 @@ export class ProviderValidator {
 
             const responsable_cellphone: string = !body.responsable_cellphone || validator.isEmpty(body.responsable_cellphone) ?
                 errors.push({message: 'El número del responsable es obligatorio'}) : body.responsable_cellphone;
-
-            const status: number = !body.status || validator.isEmpty(body.status) ?
-                errors.push({message: 'El estatus es obligatorio.'}) : body.status;
 
             if (errors.length > 0) {
                 return {

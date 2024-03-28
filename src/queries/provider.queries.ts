@@ -20,7 +20,12 @@ export class ProviderQueries {
 
     public async index() {
         try {
-            let providers = await ProviderModel.findAll({order: [["createdAt", "ASC"]]})
+            let providers = await ProviderModel.findAll({
+                where: {
+                    status: [1, 0]
+                },
+                order: [["createdAt", "ASC"]]
+            })
             return {ok: true, providers}
         } catch (e) {
             console.log(e)

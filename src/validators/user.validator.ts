@@ -8,7 +8,7 @@ export class UserValidator {
         try {
             const regex = new RegExp('^[A-Za-zÀ-ú _]*[A-Za-zÀ-ú][A-Za-zÀ-ú _]*$');
 
-            const role_id: number = !body.role_id || validator.isEmpty(body.role_id) ?
+            const role_id: number = !body.role_id ?
                 errors.push({message: 'El rol es obligatorio'}) : body.role_id;
 
             const name: string = !body.name || validator.isEmpty(body.name) ?
@@ -60,7 +60,7 @@ export class UserValidator {
         try {
             const regex = new RegExp('^[A-Za-zÀ-ú _]*[A-Za-zÀ-ú][A-Za-zÀ-ú _]*$');
 
-            const role_id: number = !body.role_id || validator.isEmpty(body.role_id) ?
+            const role_id: number = !body.role_id ?
                 errors.push({message: 'El rol es obligatorio'}) : body.role_id;
 
             const name: string = !body.name || validator.isEmpty(body.name) ?
@@ -71,9 +71,6 @@ export class UserValidator {
 
             const email: string = !body.email || validator.isEmpty(body.email) ?
                 errors.push({message: 'El email es obligatorio'}) : body.email;
-
-            const status: number = !body.status || validator.isEmpty(body.status) ?
-                errors.push({message: 'El estatus es obligatorio.'}) : body.status;
 
             if (!validator.isEmail(email)) {
                 errors.push({message: 'Favor de respetar la nomenclatura del correo electrónico'})
