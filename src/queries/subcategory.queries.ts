@@ -20,7 +20,12 @@ export class SubcategoryQueries {
 
     public async index() {
         try {
-            let subcategories = await SubcategoryModel.findAll({order: [["createdAt", "ASC"]]})
+            let subcategories = await SubcategoryModel.findAll({
+                where: {
+                    status: [0, 1]
+                },
+                order: [["createdAt", "ASC"]]
+            })
             return {ok: true, subcategories}
         } catch (e) {
             console.log(e)

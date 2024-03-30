@@ -4,11 +4,10 @@ import {database} from '../config/database'
 export class CouponModel extends Model {
     public id: number;
     public user_id: number;
-    public discount_type_id: number;
     public uuid: string;
     public coupon: string;
     public quantity: number;
-    public discount_amount: number;
+    public discount_percent: number;
     public expiration: string;
     public status: number;
     public createdAt: string;
@@ -22,11 +21,10 @@ CouponModel.init({
         primaryKey: true
     },
     user_id: {type: DataTypes.INTEGER},
-    discount_type_id: {type: DataTypes.INTEGER},
     uuid: {type: DataTypes.STRING},
     coupon: {type: DataTypes.STRING},
     quantity: {type: DataTypes.NUMBER},
-    discount_amount: {type: DataTypes.NUMBER},
+    discount_percent: {type: DataTypes.NUMBER},
     expiration: {type: DataTypes.DATE},
     status: {type: DataTypes.INTEGER},
     createdAt: {type: DataTypes.DATE, allowNull: true},

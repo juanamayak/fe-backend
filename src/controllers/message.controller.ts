@@ -125,4 +125,55 @@ export class MessageController {
             message: 'El registro se actualizo correctamente'
         });
     }
+
+    public async delete(req: Request, res: Response) {
+        const body = req.body;
+        const errors = [];
+
+        const messageUuid = !req.params.uuid || validator.isEmpty(req.params.uuid) ?
+            errors.push({message: 'Favor de proporcionar la dirección.'}) : req.params.uuid
+
+        if (errors.length > 0) {
+            return res.status(JsonResponse.BAD_REQUEST).json({
+                ok: false,
+                errors
+            });
+        }
+
+        const findedMessage = await MessageController.messageQueries.show({
+            uuid: messageUuid
+        });
+
+        if (!findedMessage.ok) {
+            errors.push({message: 'Existen problema al buscar el registro solicitado'});
+        } else if (!findedMessage.message) {
+            errors.push({message: 'El registro no se encuentra dada de alta'});
+        }
+
+        if (errors.length > 0) {
+            return res.status(JsonResponse.BAD_REQUEST).json({
+                ok: false,
+                errors
+            });
+        }
+
+        const deletedMessage = await MessageController.messageQueries.delete(findedMessage.message.id, { status: -1});
+
+        if (!deletedMessage.ok) {
+            errors.push({message: 'Existen problemas al momento de eliminar el registro. Intente de nuevamente'});
+        }
+
+        if (errors.length > 0) {
+            return res.status(JsonResponse.BAD_REQUEST).json({
+                ok: false,
+                errors
+            });
+        }
+
+
+        return res.status(JsonResponse.OK).json({
+            ok: true,
+            message: 'El registro se elimino correctamente.'
+        });
+    }
 }

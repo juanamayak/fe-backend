@@ -44,9 +44,6 @@ export class MessageValidator {
             const message: number = !body.message || validator.isEmpty(body.message) ?
                 errors.push({message: 'El mensaje es obligatorio'}) : body.message;
 
-            const status: number = !body.status || validator.isEmpty(body.status) ?
-                errors.push({message: 'El estatus es obligatorio.'}) : body.status;
-
 
             if (errors.length > 0) {
                 return {

@@ -13,6 +13,7 @@ import {DeliveryHourController} from "../controllers/delivery_hour.controller";
 import {ProviderController} from "../controllers/provider.controller";
 import {SubcategoryController} from "../controllers/subcategory.controller";
 import {LocationsController} from "../controllers/locations.controller";
+import {MessageController} from "../controllers/message.controller";
 
 export class Routes {
     public addressController: AddressController = new AddressController()
@@ -25,6 +26,7 @@ export class Routes {
     public clientController: ClientController = new ClientController()
     public usersController: UsersController = new UsersController()
     public locationsController: LocationsController = new LocationsController()
+    public messagesController: MessageController = new MessageController()
 
     public routes(app: express.Application): void {
         // RUTAS DE USUARIOS
@@ -49,20 +51,15 @@ export class Routes {
         /* RUTAS DE SUBCATEGORIES */
         app.route('/api/subcategories').get(this.subcategoryController.index);
         app.route('/api/subcategories/create').post(CheckHeaders.validateJWTUser, this.subcategoryController.store);
-        app.route('/api/subcategories/update').post(this.subcategoryController.update);
+        app.route('/api/subcategories/update/:uuid').post(this.subcategoryController.update);
         app.route('/api/subcategories/delete/:uuid').put(this.subcategoryController.delete);
 
         /* RUTAS DE CUPONES */
         app.route('/api/coupons').get(this.couponController.index);
-        app.route('/api/coupons/create').post(this.couponController.store);
-        app.route('/api/coupons/update').post(this.couponController.update);
-        app.route('/api/coupons/delete').post(this.couponController.delete);
-
-        /* RUTAS DE HORARIOS  */
-        app.route('/api/hours').get(this.deliveryHourController.index);
-        app.route('/api/hours/create').post(this.deliveryHourController.store);
-        app.route('/api/hours/update').post(this.deliveryHourController.update);
-        app.route('/api/hours/delete').post(this.deliveryHourController.delete);
+        app.route('/api/coupons/create').post(CheckHeaders.validateJWTUser, this.couponController.store);
+        app.route('/api/coupons/update/:uuid').post(this.couponController.update);
+        app.route('/api/coupons/status/:uuid').put(this.couponController.status);
+        app.route('/api/coupons/delete/:uuid').put(this.couponController.delete);
 
         // RUTAS DE LOCALIDADES
         app.route('/api/countries').get(this.locationsController.countries);
@@ -86,6 +83,12 @@ export class Routes {
         app.route('/api/addresses/create').post(this.addressController.store);
         app.route('/api/addresses/update').post(this.addressController.update);
         app.route('/api/addresses/delete').post(this.addressController.delete);
+
+        /* RUTAS DEDICATORIAS */
+        app.route('/api/dedications').get(this.messagesController.index);
+        app.route('/api/dedications/create').post(CheckHeaders.validateJWTUser, this.messagesController.store);
+        app.route('/api/dedications/update/:uuid').post(this.messagesController.update);
+        app.route('/api/dedications/delete/:uuid').put(this.messagesController.delete);
 
         // RUTAS DE COSTOS DE ENVÍO
 

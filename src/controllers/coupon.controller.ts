@@ -46,11 +46,10 @@ export class CouponController {
 
         const data = {
             user_id,
-            discount_type_id: body.discount_type_id,
             uuid: uuidv4(),
             coupon: body.coupon,
             quantity: body.quantity,
-            discount_amount: body.discount_amount,
+            discount_percent: body.discount_percent,
             expiration: body.expiration,
             status: 1
         }
@@ -129,6 +128,56 @@ export class CouponController {
         });
     }
 
+    public async status(req: Request, res: Response) {
+        const status = req.body.status
+        const errors = [];
+
+        const couponUuid = !req.params.uuid || validator.isEmpty(req.params.uuid) ?
+            errors.push({message: 'Favor de proporcionar el usuario.'}) : req.params.uuid
+
+        if (errors.length > 0) {
+            return res.status(JsonResponse.BAD_REQUEST).json({
+                ok: false,
+                errors
+            });
+        }
+
+        const findedCoupon = await CouponController.couponQueries.show({
+            uuid: couponUuid
+        });
+
+        if (!findedCoupon.ok) {
+            errors.push({message: 'Existen problemas al registro solicitado'});
+        } else if (!findedCoupon.coupon) {
+            errors.push({message: 'El registro no se encuentra dado de alta'});
+        }
+
+        if (errors.length > 0) {
+            return res.status(JsonResponse.BAD_REQUEST).json({
+                ok: false,
+                errors
+            });
+        }
+
+        const updatedStatus = await CouponController.couponQueries.status(findedCoupon.coupon.id, {status: status});
+
+        if (!updatedStatus.ok) {
+            errors.push({message: 'Existen problemas al momento de actualizar el registro. Intente de nuevamente'});
+        }
+
+        if (errors.length > 0) {
+            return res.status(JsonResponse.BAD_REQUEST).json({
+                ok: false,
+                errors
+            });
+        }
+
+        return res.status(JsonResponse.OK).json({
+            ok: true,
+            message: 'El registro se actualizo correctamente.'
+        });
+    }
+
     public async delete(req: Request, res: Response) {
         const errors = [];
 
@@ -159,7 +208,7 @@ export class CouponController {
             });
         }
 
-        const deletedCoupon = await CouponController.couponQueries.delete(findedCoupon.coupon.id, { status: 0});
+        const deletedCoupon = await CouponController.couponQueries.delete(findedCoupon.coupon.id, { status: -1});
 
         if (!deletedCoupon.ok) {
             errors.push({message: 'Existen problemas al momento de eliminar el registro. Intente de nuevamente'});

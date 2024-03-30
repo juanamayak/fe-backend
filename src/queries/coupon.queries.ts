@@ -2,6 +2,7 @@ import {Op} from 'sequelize';
 import {CouponModel} from "../models/coupons.model";
 import {AddressModel} from "../models/address.model";
 import {CategoryModel} from "../models/category.model";
+import {UserModel} from "../models/user.model";
 
 export class CouponQueries {
 
@@ -21,7 +22,12 @@ export class CouponQueries {
 
     public async index() {
         try {
-            let coupons = await CouponModel.findAll({order: [["createdAt", "ASC"]]})
+            let coupons = await CouponModel.findAll({
+                where: {
+                    status: [0, 1]
+                },
+                order: [["createdAt", "ASC"]]
+            })
             return {ok: true, coupons}
         } catch (e) {
             console.log(e)
@@ -48,6 +54,21 @@ export class CouponQueries {
                     }
                 })
             return {ok: true, coupon}
+        } catch (e) {
+            console.log(e)
+            return {ok: false}
+        }
+    }
+
+    public async status(couponId: any, data: any) {
+        try {
+            let coupon = await CouponModel.update(
+                data, {
+                    where: {
+                        id: couponId,
+                    }
+                });
+            return {ok: true}
         } catch (e) {
             console.log(e)
             return {ok: false}

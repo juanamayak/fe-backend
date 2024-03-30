@@ -1,6 +1,7 @@
 import {Op} from 'sequelize';
 import {MessageModel} from "../models/message.model";
 import {CouponModel} from "../models/coupons.model";
+import {AddressModel} from "../models/address.model";
 
 export class MessageQueries {
 
@@ -20,7 +21,12 @@ export class MessageQueries {
 
     public async index() {
         try {
-            let messages = await MessageModel.findAll({order: [["createdAt", "ASC"]]})
+            let messages = await MessageModel.findAll({
+                where: {
+                    status: [0, 1]
+                },
+                order: [["createdAt", "ASC"]]
+            })
             return {ok: true, messages}
         } catch (e) {
             console.log(e)
@@ -47,6 +53,21 @@ export class MessageQueries {
                     }
                 })
             return {ok: true, message}
+        } catch (e) {
+            console.log(e)
+            return {ok: false}
+        }
+    }
+
+    public async delete(addressId: any, data: any) {
+        try {
+            let message = await MessageModel.update(
+                data, {
+                    where: {
+                        id: addressId,
+                    }
+                })
+            return {ok: true}
         } catch (e) {
             console.log(e)
             return {ok: false}
