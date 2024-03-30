@@ -13,6 +13,22 @@ export class CouponController {
     static couponQueries: CouponQueries = new CouponQueries();
     static couponValidator: CouponValidator = new CouponValidator();
 
+    public async index(req: Request, res: Response) {
+        let coupons = await CouponController.couponQueries.index();
+
+        if (!coupons.ok) {
+            return res.status(JsonResponse.BAD_REQUEST).json({
+                ok: false,
+                errors: [{message: 'Ocurrio un error al obtener los registros.'}]
+            });
+        }
+
+        return res.status(JsonResponse.OK).json({
+            ok: true,
+            coupons: coupons.coupons,
+        });
+    }
+
     public async store(req: Request, res: Response) {
         const body = req.body;
 

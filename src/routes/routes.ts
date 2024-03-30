@@ -53,7 +53,7 @@ export class Routes {
         app.route('/api/subcategories/delete/:uuid').put(this.subcategoryController.delete);
 
         /* RUTAS DE CUPONES */
-        // app.route('/api/coupons').get(this.couponController.index);
+        app.route('/api/coupons').get(this.couponController.index);
         app.route('/api/coupons/create').post(this.couponController.store);
         app.route('/api/coupons/update').post(this.couponController.update);
         app.route('/api/coupons/delete').post(this.couponController.delete);
