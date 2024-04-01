@@ -9,17 +9,18 @@ import {ClientController} from "../controllers/client.controller";
 import {AddressController} from "../controllers/address.controller";
 import {CategoryController} from "../controllers/category.controller";
 import {CouponController} from "../controllers/coupon.controller";
-import {DeliveryHourController} from "../controllers/delivery_hour.controller";
 import {ProviderController} from "../controllers/provider.controller";
 import {SubcategoryController} from "../controllers/subcategory.controller";
 import {LocationsController} from "../controllers/locations.controller";
 import {MessageController} from "../controllers/message.controller";
+import {RolesController} from "../controllers/roles.controller";
+import {PermissionsController} from "../controllers/permissions.controller";
 
 export class Routes {
     public addressController: AddressController = new AddressController()
     public categoryController: CategoryController = new CategoryController()
     public couponController: CouponController = new CouponController()
-    public deliveryHourController: DeliveryHourController = new DeliveryHourController()
+    public rolesController: RolesController = new RolesController()
     public productController: ProductController = new ProductController()
     public providerController: ProviderController = new ProviderController()
     public subcategoryController: SubcategoryController = new SubcategoryController()
@@ -27,6 +28,7 @@ export class Routes {
     public usersController: UsersController = new UsersController()
     public locationsController: LocationsController = new LocationsController()
     public messagesController: MessageController = new MessageController()
+    public permissionsController: PermissionsController = new PermissionsController()
 
     public routes(app: express.Application): void {
         // RUTAS DE USUARIOS
@@ -96,6 +98,8 @@ export class Routes {
 
         // RUTAS DE ORDENES
 
-        // RUTAS DE ROLES
+        // RUTAS DE ROLES AND PERMISSIONS
+        app.route('/api/roles').get(this.rolesController.index);
+        app.route('/api/permissions/assign').get(this.permissionsController.assign);
     }
 }
