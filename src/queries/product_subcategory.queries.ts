@@ -1,10 +1,10 @@
 import {Op} from 'sequelize'
-import {ProductProviderModel} from "../models/product_provider.model";
+import {ProductSubcategoryModel} from "../models/product_subcategory.model";
 
-export class ProductProviderQueries {
+export class ProductSubcategoryQueries {
     public async create(data) {
         try {
-            let productProvider = await ProductProviderModel.bulkCreate(data);
+            let productSubcategory = await ProductSubcategoryModel.bulkCreate(data);
             return {ok: true}
         } catch (e) {
             console.log(e)

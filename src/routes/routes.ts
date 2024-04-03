@@ -70,7 +70,7 @@ export class Routes {
 
         // RUTAS DE PRODUCTOS
         app.route('/api/products').get(this.productController.index);
-        app.route('/api/products/create').post(this.productController.store);
+        app.route('/api/products/create').post(CheckHeaders.validateJWTUser, this.productController.store);
         app.route('/api/products/update').post(this.productController.update);
         app.route('/api/products/delete').post(this.productController.delete);
 

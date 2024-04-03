@@ -15,14 +15,14 @@ import {ProductQueries} from "../queries/product.queries";
 import {ProviderQueries} from "../queries/provider.queries";
 import {ProductProviderQueries} from "../queries/product_provider.queries";
 import {ImageQueries} from "../queries/image.queries";
+import {ProductSubcategoryQueries} from "../queries/product_subcategory.queries";
 
 export class ProductController {
 
     static file: File = new File();
-
     static productsValidator: ProductValidator = new ProductValidator();
-
     static productProviderQueries: ProductProviderQueries = new ProductProviderQueries();
+    static productSubcategoryQueries: ProductSubcategoryQueries = new ProductSubcategoryQueries();
     static productQueries: ProductQueries = new ProductQueries();
     static imageQueries: ImageQueries = new ImageQueries();
 
@@ -44,8 +44,9 @@ export class ProductController {
 
     public async store(req: Request, res: Response) {
         const body = req.body;
-        const images = req.files;
         const user_id = req.body.user_id;
+        const providers = req.body.providers;
+        const subcategories = req.body.subcategories;
 
         // Validacion del request
         const validatedData = await ProductController.productsValidator.validateStore(body);
@@ -59,13 +60,12 @@ export class ProductController {
 
         const data = {
             user_id,
-            country_id: body.country_id,
-            discount_type_id: body.discount_type_id,
+            category_id: body.category_id,
             uuid: uuidv4(),
             name: body.name,
             price: body.price,
             sku: moment().unix(),
-            discount_amount: body.discount_amount,
+            discount_percent: body.discount_percent,
             description: body.description,
             status: 1
         }
@@ -79,26 +79,38 @@ export class ProductController {
             });
         }
 
-        const productProviderData = {
-            product_id: createdProduct.product ? createdProduct.product.id : 0,
-            provider_id: body.provider_id
+        let productProviders = []
+        for (const provider of providers) {
+            productProviders.push({
+                product_id: createdProduct.product.id,
+                provider_id: provider
+            });
         }
 
-        const createdProductProvider = await ProductController.productProviderQueries.create(productProviderData);
+        const createdProductProvider = await ProductController.productProviderQueries.create(productProviders);
 
         if (!createdProductProvider.ok) {
             return res.status(JsonResponse.BAD_REQUEST).json({
                 ok: false,
-                errors: [{message: "Existen problemas al momento de agregar el producto al proveedor. Intente más tarde."}]
+                errors: [{message: "Existen problemas al momento de agregar los proveedores. Intente más tarde."}]
             });
         }
 
-        const productImagesCreated = await ProductController.processImages(images, createdProduct.product);
-        if (!productImagesCreated.ok) {
+        let productSubcategories = []
+        for (const subcategory of subcategories) {
+            productSubcategories.push({
+                product_id: createdProduct.product.id,
+                subcategory_id: subcategory
+            });
+        }
+
+        const createdProductSubcategory = await ProductController.productSubcategoryQueries.create(productSubcategories);
+
+        if (!createdProductSubcategory.ok) {
             return res.status(JsonResponse.BAD_REQUEST).json({
                 ok: false,
-                errors: productImagesCreated.errors
-            })
+                errors: [{message: "Existen problemas al momento de agregar las subcategorias. Intente más tarde."}]
+            });
         }
 
         return res.status(JsonResponse.OK).json({

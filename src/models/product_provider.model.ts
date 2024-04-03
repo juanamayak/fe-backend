@@ -17,6 +17,6 @@ ProductProviderModel.init({
     provider_id: {type: DataTypes.INTEGER},
 }, {
     sequelize: database,
-    timestamps: true,
+    timestamps: false,
     tableName: 'product_provider'
 });
