@@ -47,6 +47,7 @@ export class ProductController {
         const user_id = req.body.user_id;
         const providers = req.body.providers;
         const subcategories = req.body.subcategories;
+        const images = req.files;
 
         // Validacion del request
         const validatedData = await ProductController.productsValidator.validateStore(body);
@@ -111,6 +112,14 @@ export class ProductController {
                 ok: false,
                 errors: [{message: "Existen problemas al momento de agregar las subcategorias. Intente más tarde."}]
             });
+        }
+
+        const productImagesCreated = await ProductController.processImages(images, createdProduct.product);
+        if (!productImagesCreated.ok) {
+            return res.status(JsonResponse.BAD_REQUEST).json({
+                ok: false,
+                errors: productImagesCreated.errors
+            })
         }
 
         return res.status(JsonResponse.OK).json({

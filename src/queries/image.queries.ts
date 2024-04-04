@@ -1,6 +1,6 @@
 import {Op} from 'sequelize'
 import {AddressModel} from '../models/address.model'
-import {ImageModel} from "../models/image.mode";
+import {ImageModel} from "../models/image.model";
 
 export class ImageQueries {
 
