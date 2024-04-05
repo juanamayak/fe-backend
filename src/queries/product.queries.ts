@@ -1,5 +1,8 @@
 import {Op} from 'sequelize'
 import {ProductModel} from "../models/product.model";
+import {SubcategoryModel} from "../models/subcategory.model";
+import {ProviderModel} from "../models/provider.model";
+import {ImageModel} from "../models/image.model";
 
 export class ProductQueries {
 
@@ -8,7 +11,11 @@ export class ProductQueries {
             const product = await ProductModel.findOne({
                 where: {
                     uuid: data.uuid
-                }
+                },
+                include: [
+                    { model: SubcategoryModel, as: 'subcategories'},
+                    { model: ProviderModel, as: 'providers'}
+                ]
             })
             return {ok: true, product}
         } catch (e) {

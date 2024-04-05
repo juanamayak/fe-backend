@@ -16,6 +16,7 @@ import {ProviderQueries} from "../queries/provider.queries";
 import {ProductProviderQueries} from "../queries/product_provider.queries";
 import {ImageQueries} from "../queries/image.queries";
 import {ProductSubcategoryQueries} from "../queries/product_subcategory.queries";
+import {random, randomInt} from "mathjs";
 
 export class ProductController {
 
@@ -25,6 +26,42 @@ export class ProductController {
     static productSubcategoryQueries: ProductSubcategoryQueries = new ProductSubcategoryQueries();
     static productQueries: ProductQueries = new ProductQueries();
     static imageQueries: ImageQueries = new ImageQueries();
+
+    public async show(req: Request, res: Response){
+        const errors = [];
+
+        const productUuid = !req.params.uuid || validator.isEmpty(req.params.uuid) ?
+            errors.push({message: 'Favor de proporcionar el producto'}) : req.params.uuid;
+
+        if (errors.length > 0) {
+            return res.status(JsonResponse.BAD_REQUEST).json({
+                ok: false,
+                errors
+            });
+        }
+
+        const product = await ProductController.productQueries.show({
+            uuid: productUuid
+        });
+
+        if (!product.ok) {
+            errors.push({message: 'Existen problemas al buscar el registro solicitado'});
+        } else if (!product.product) {
+            errors.push({message: 'El registro no se encuentra dado de alta'});
+        }
+
+        if (errors.length > 0) {
+            return res.status(JsonResponse.BAD_REQUEST).json({
+                ok: false,
+                errors
+            });
+        }
+
+        return res.status(JsonResponse.OK).json({
+            ok: true,
+            product: product.product
+        });
+    }
 
     public async index(req: Request, res: Response) {
         let products = await ProductController.productQueries.index()
@@ -47,7 +84,7 @@ export class ProductController {
         const user_id = req.body.user_id;
         const providers = req.body.providers;
         const subcategories = req.body.subcategories;
-        const images = req.files;
+        const images = req.files.images;
 
         // Validacion del request
         const validatedData = await ProductController.productsValidator.validateStore(body);
@@ -241,9 +278,11 @@ export class ProductController {
     }
 
     private static async processImages(images: any, product: any) {
+        console.log(images);
         for (const image of images) {
+            console.log(image);
             const imageExtension = image.name.toLowerCase().substring(image.name.lastIndexOf('.'));
-            const imageName = `P-${moment().unix()}-${product.id}${imageExtension}`;
+            const imageName = `P-${moment().unix()}-${randomInt(1,99)}-${product.id}${imageExtension}`;
 
             const imageUploaded = await ProductController.file.upload(image, imageName, 'product')
 
@@ -255,10 +294,9 @@ export class ProductController {
             }
 
             const data = {
-                name: imageName,
                 path: process.env.PROD_IMAGES_PATH + imageName,
                 media_type: image.mimetype,
-                imageable_type: 'Product',
+                imageable_type: 'PRODUCT',
                 imageable_id: product.id
             }
 

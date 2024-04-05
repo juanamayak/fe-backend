@@ -16,16 +16,30 @@ import {ProductModel} from "../models/product.model";
 import {PaymentMethodModel} from "../models/payment_method.model";
 import {CategoryModel} from "../models/category.model";
 import {SubcategoryModel} from "../models/subcategory.model";
+import {ProviderModel} from "../models/provider.model";
+import {ImageModel} from "../models/image.model";
 
 export default class Relationship {
     static init() {
-        /**
-         * Example.belongsTo(Foreign_Model_Name, { foreignKey: 'foreign_key_id', as: 'NameModel' })
-         */
+
+        ProductModel.belongsToMany(SubcategoryModel, { through: 'ProductSubcategoryModel', foreignKey: 'product_id', as: 'subcategories'});
+        SubcategoryModel.belongsToMany(ProductModel, {
+            through: 'ProductSubcategoryModel', // Nombre de la tabla intermedia
+            foreignKey: 'subcategory_id', // Nombre de la columna que hace referencia al id de la subcategoría
+            as: 'products'
+        });
 
 
-        // RELACIONES DE CATEGORIAS
+        ProductModel.belongsToMany(ProviderModel, { through: 'ProductProviderModel', foreignKey: 'product_id', as: 'providers'});
+        ProviderModel.belongsToMany(ProductModel, {
+            through: 'ProductProviderModel', // Nombre de la tabla intermedia
+            foreignKey: 'provider_id', // Nombre de la columna que hace referencia al id de la subcategoría
+            as: 'products'
+        });
 
+        ProductModel.hasMany(ImageModel, { foreignKey: 'imageable_id', scope: {imageable_type: 'PRODUCT'}, as: 'images' });
+
+        /* Relaciones de Categorias */
         CategoryModel.hasMany(SubcategoryModel, {foreignKey: 'category_id', as: 'subcategories'});
 
         /* Relaciones de Clients */
@@ -47,8 +61,10 @@ export default class Relationship {
         CouponModel.belongsToMany(ClientModel, {through: 'ClientOrderCouponModel', foreignKey: 'coupon_id'});
 
         /* Relaciones de Carts */
-        CartModel.belongsToMany(ProductModel, {through: 'CartProduct', foreignKey: 'cart_id'})
-        ProductModel.belongsToMany(CartModel, {through: 'CartProduct', foreignKey: 'product_id'})
+        CartModel.belongsToMany(ProductModel, {through: 'CartProduct', foreignKey: 'cart_id'});
+        ProductModel.belongsToMany(CartModel, {through: 'CartProduct', foreignKey: 'product_id'});
+
+
 
 
     }

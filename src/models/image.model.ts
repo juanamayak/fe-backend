@@ -26,7 +26,7 @@ ImageModel.init({
     imageable_type: {
         type: DataTypes.STRING
     },
-    imgeable_id: {
+    imageable_id: {
         type: DataTypes.INTEGER
     },
     createdAt: {

@@ -32,7 +32,7 @@ export class ImagesController {
         const images = req.files.images;
         const productId = req.body.product_id;
 
-        if (images != null) {
+        /*if (images != null) {
             if (Array.isArray(images)) {
                 for (const image of images) {
                     const uploadImage = await ImagesController.file.upload(image, productId);
@@ -54,7 +54,7 @@ export class ImagesController {
                     const createdImage = await ImagesController.imagesQueries.create(data);
                 }
             }
-        }
+        }*/
 
         return res.status(JsonResponse.OK).json({
             ok: true
