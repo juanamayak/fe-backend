@@ -28,7 +28,7 @@ ProductModel.init({
     name: {type: DataTypes.STRING},
     price: {type: DataTypes.DECIMAL},
     sku: {type: DataTypes.STRING},
-    discount_percent: {type: DataTypes.DECIMAL},
+    discount_percent: {type: DataTypes.STRING},
     description: {type: DataTypes.STRING},
     status: {type: DataTypes.INTEGER},
     createdAt: {

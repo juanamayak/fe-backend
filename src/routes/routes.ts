@@ -74,6 +74,7 @@ export class Routes {
         app.route('/api/products/create').post(CheckHeaders.validateJWTUser, this.productController.store);
         app.route('/api/products/update').post(this.productController.update);
         app.route('/api/products/delete').post(this.productController.delete);
+        app.route('/api/products/images/:uuid').get(this.productController.images);
 
         /* RUTAS DE PROVEEDORES  */
         app.route('/api/providers').get(this.providerController.index);

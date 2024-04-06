@@ -277,10 +277,60 @@ export class ProductController {
         });
     }
 
+    public async images(req: Request, res: Response) {
+        const errors = [];
+
+        const productUuid = !req.params.uuid || validator.isEmpty(req.params.uuid) ?
+            errors.push({message: 'Favor de proporcionar el producto'}) : req.params.uuid;
+
+        if (errors.length > 0) {
+            return res.status(JsonResponse.BAD_REQUEST).json({
+                ok: false,
+                errors
+            });
+        }
+
+        const product = await ProductController.productQueries.show({
+            uuid: productUuid
+        });
+
+        if (!product.ok) {
+            errors.push({message: 'Existen problemas al buscar el registro solicitado'});
+        } else if (!product.product) {
+            errors.push({message: 'El registro no se encuentra dado de alta'});
+        }
+
+        // Obtenemos los archivos subidos al reporte
+        const images = await ProductController.imageQueries.productImages({
+            imageable_id: product.product.id
+        })
+
+        if(!images.ok) {
+            return res.status(JsonResponse.BAD_REQUEST).json({
+                ok: false,
+                errors: [{message: "Existen problemas al momento de obtener los archivos de evidencia del operador."}]
+            })
+        }
+        let downloadedImages: any;
+        if(images.images && images.images.length > 0) {
+            downloadedImages = await ProductController.downloadImages(images.images);
+
+            if(!downloadedImages.ok) {
+                return res.status(JsonResponse.BAD_REQUEST).json({
+                    ok: false,
+                    errors: downloadedImages.errors
+                })
+            }
+        }
+
+        return res.status(JsonResponse.OK).json({
+            ok: true,
+            images: downloadedImages.base64Images
+        })
+    }
+
     private static async processImages(images: any, product: any) {
-        console.log(images);
         for (const image of images) {
-            console.log(image);
             const imageExtension = image.name.toLowerCase().substring(image.name.lastIndexOf('.'));
             const imageName = `P-${moment().unix()}-${randomInt(1,99)}-${product.id}${imageExtension}`;
 
@@ -311,5 +361,31 @@ export class ProductController {
 
         }
         return {ok: true}
+    }
+
+    private static async downloadImages(images: any) {
+        try {
+            const base64Images = []
+            for (const image of images) {
+                const downloadedImage = await ProductController.file.download(image.path, 'product')
+
+                if (!downloadedImage.ok) {
+                    return {
+                        ok: false,
+                        errors: [{ message: "Existen problemas al momento de obtener el archivo."}]
+                    }
+                }
+
+                base64Images.push(downloadedImage.image)
+
+            }
+            return { ok: true, base64Images }
+        } catch (e) {
+            console.log(e)
+            return {
+                ok: false,
+                errors: [{ message: "Existen problemas al momento de obtener los archivos de la evidencia." }]
+            }
+        }
     }
 }

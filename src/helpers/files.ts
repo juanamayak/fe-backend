@@ -24,7 +24,7 @@ export class File {
         const bytes: number = 1048576;
         const totalSize: number = (size / bytes);
 
-        if(totalSize > 2.00) {
+        if (totalSize > 2.00) {
             return {
                 ok: false,
                 message: 'La imagen es demasiado pesada. Limite permitido: 2MB'
@@ -55,18 +55,17 @@ export class File {
             }
         })
 
-        return { ok: true, imageName }
+        return {ok: true, imageName}
     }
 
-    public async download(name, type) {
+    public async download(path, type) {
 
-        let path: string = (type == 'documentacion') ? process.env.DOCUMENTATION_PATH : process.env.MESSAGE_DOCS_PATH
-        
+        // let path: string = (type == 'product') ? process.env.PROD_IMAGES_PATH : '';
         try {
-            return { ok: true, pdf: fs.readFileSync(path + name) }
-        } catch(e) {
+            return {ok: true, image: fs.readFileSync(path, {encoding: 'base64'})}
+        } catch (e) {
             console.log('Error files a las: ' + moment().format('YYYY-MM-DD HH:mm:ss') + ', ' + e)
-            return { ok: false, message: 'Existen problemas al momento de obtener el pdf!' }
+            return {ok: false, message: 'Existen problemas al momento de obtener la imagen'}
         }
 
     }
@@ -75,10 +74,10 @@ export class File {
         let path: string = (type == 'documentacion') ? process.env.DOCUMENTATION_PATH : null
 
         try {
-            return { ok: true, pdf: fs.unlinkSync(path + name) }
-        } catch(e) {
+            return {ok: true, pdf: fs.unlinkSync(path + name)}
+        } catch (e) {
             console.log('Error files a las: ' + moment().format('YYYY-MM-DD HH:mm:ss') + ', ' + e)
-            return { ok: false, message: 'Existen problemas al momento de eliminar el pdf!' }
+            return {ok: false, message: 'Existen problemas al momento de eliminar el pdf!'}
         }
     }
 }

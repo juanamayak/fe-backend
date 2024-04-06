@@ -67,4 +67,18 @@ export class ImageQueries {
             return {ok: false}
         }
     }
+
+    public async productImages(data: any) {
+        try {
+            const images = await ImageModel.findAll({
+                where: {
+                    imageable_id: data.imageable_id
+                }
+            });
+            return {ok: true, images}
+        } catch (e) {
+            console.log(e)
+            return {ok: false}
+        }
+    }
 }

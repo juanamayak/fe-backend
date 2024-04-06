@@ -15,9 +15,6 @@ export class ProductValidator {
             let price: string = !body.price ?
                 errors.push({message: 'El precio del producto es obligatorio'}) : body.price;
 
-            let discount_percent: string = !body.discount_percent || validator.isEmpty(body.discount_percent) ?
-                errors.push({message: 'El monto de descuento es obligatorio'}) : body.discount_percent;
-
             let providers: string = !body.providers || body.providers.length === 0 ?
                 errors.push({message: 'El proveedor es obligatorio'}) : body.providers;
 
