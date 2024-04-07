@@ -58,11 +58,21 @@ export class File {
         return {ok: true, imageName}
     }
 
-    public async download(path, type) {
+    public async download(image, type) {
 
         // let path: string = (type == 'product') ? process.env.PROD_IMAGES_PATH : '';
+
         try {
-            return {ok: true, image: fs.readFileSync(path, {encoding: 'base64'})}
+            return {
+                ok: true,
+                image: {
+                    file: {
+                        name: image.name,
+                        type: image.media_type,
+                    },
+                    url: fs.readFileSync(image.path, {encoding: 'base64'})
+                }
+            }
         } catch (e) {
             console.log('Error files a las: ' + moment().format('YYYY-MM-DD HH:mm:ss') + ', ' + e)
             return {ok: false, message: 'Existen problemas al momento de obtener la imagen'}

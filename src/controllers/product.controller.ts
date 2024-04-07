@@ -85,6 +85,7 @@ export class ProductController {
         const providers = req.body.providers;
         const subcategories = req.body.subcategories;
         const images = req.files.images;
+        console.log(images);
 
         // Validacion del request
         const validatedData = await ProductController.productsValidator.validateStore(body);
@@ -331,6 +332,7 @@ export class ProductController {
 
     private static async processImages(images: any, product: any) {
         for (const image of images) {
+            console.log(image);
             const imageExtension = image.name.toLowerCase().substring(image.name.lastIndexOf('.'));
             const imageName = `P-${moment().unix()}-${randomInt(1,99)}-${product.id}${imageExtension}`;
 
@@ -345,6 +347,7 @@ export class ProductController {
 
             const data = {
                 path: process.env.PROD_IMAGES_PATH + imageName,
+                name: imageName,
                 media_type: image.mimetype,
                 imageable_type: 'PRODUCT',
                 imageable_id: product.id
@@ -367,7 +370,7 @@ export class ProductController {
         try {
             const base64Images = []
             for (const image of images) {
-                const downloadedImage = await ProductController.file.download(image.path, 'product')
+                const downloadedImage = await ProductController.file.download(image, 'product')
 
                 if (!downloadedImage.ok) {
                     return {

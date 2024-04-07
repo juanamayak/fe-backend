@@ -26,7 +26,7 @@ export class ProductQueries {
 
     public async index() {
         try {
-            let products = await ProductModel.findAll({order: [["createdAt", "ASC"]]})
+            let products = await ProductModel.findAll({order: [["createdAt", "DESC"]]})
             return {ok: true, products}
         } catch (e) {
             console.log(e)

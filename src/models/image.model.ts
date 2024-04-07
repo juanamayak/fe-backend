@@ -4,6 +4,7 @@ import {database} from '../config/database'
 export class ImageModel extends Model {
     public id: number;
     public path: string;
+    public name: string;
     public media_type: string;
     public imageable_type: string;
     public imageable_id: number;
@@ -18,6 +19,9 @@ ImageModel.init({
         primaryKey: true
     },
     path: {
+        type: DataTypes.STRING
+    },
+    name: {
         type: DataTypes.STRING
     },
     media_type: {
