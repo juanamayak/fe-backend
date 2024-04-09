@@ -85,7 +85,6 @@ export class ProductController {
         const providers = req.body.providers;
         const subcategories = req.body.subcategories;
         const images = req.files.images;
-        console.log(images);
 
         // Validacion del request
         const validatedData = await ProductController.productsValidator.validateStore(body);
@@ -104,7 +103,7 @@ export class ProductController {
             name: body.name,
             price: body.price,
             sku: moment().unix(),
-            discount_percent: body.discount_percent,
+            discount_percent: body.discount_percent ? body.discount_percent : null,
             description: body.description,
             status: 1
         }
@@ -169,6 +168,8 @@ export class ProductController {
 
     public async update(req: Request, res: Response) {
         const body = req.body;
+        const providers = req.body.providers;
+        const subcategories = req.body.subcategories;
         const errors = [];
 
         const productUuid = !req.params.uuid || validator.isEmpty(req.params.uuid) ?
@@ -208,6 +209,14 @@ export class ProductController {
             });
         }
 
+        const data = {
+            category_id: body.category_id,
+            name: body.name,
+            price: body.price,
+            discount_percent: body.discount_percent ? body.discount_percent : null,
+            description: body.description
+        }
+
         const productUpdated = await ProductController.productQueries.update(product.product.id, body);
 
         if (!productUpdated.product) {
@@ -221,10 +230,30 @@ export class ProductController {
             });
         }
 
+        // providers
+        const providers = await ProductController.productProviderQueries.getProductProviders({
+            product_id: product.product.id
+        });
+
+        console.log(providers)
+
+        /*if (!product.ok) {
+            errors.push({message: 'Existen problemas al buscar el registro solicitado'});
+        } else if (!product.product) {
+            errors.push({message: 'El registro no se encuentra dado de alta'});
+        }
+
+        if (errors.length > 0) {
+            return res.status(JsonResponse.BAD_REQUEST).json({
+                ok: false,
+                errors
+            });
+        }
+
         return res.status(JsonResponse.OK).json({
             ok: true,
             message: 'El registro se actualizo correctamente'
-        });
+        });*/
     }
 
     public async delete(req: Request, res: Response) {
