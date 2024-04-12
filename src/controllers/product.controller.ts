@@ -230,16 +230,12 @@ export class ProductController {
             });
         }
 
-        // providers
-        const providers = await ProductController.productProviderQueries.getProductProviders({
-            product_id: product.product.id
-        });
+        // Obtenemos proveedores que tiene el producto
+        const currentProductProviders = await ProductController.productProviderQueries.getProductProviders(product.product.id);
 
-        console.log(providers)
-
-        /*if (!product.ok) {
+        if (!currentProductProviders.ok) {
             errors.push({message: 'Existen problemas al buscar el registro solicitado'});
-        } else if (!product.product) {
+        } else if (!currentProductProviders.providers) {
             errors.push({message: 'El registro no se encuentra dado de alta'});
         }
 
@@ -250,10 +246,42 @@ export class ProductController {
             });
         }
 
+        for (const provider of currentProductProviders.providers) {
+            try {
+                await ProductController.productProviderQueries.delete(provider.id);
+            } catch (e) {
+                errors.push({message: `Error eliminando proveedor ${provider.id}: ${e.message}`});
+            }
+        }
+
+        if (errors.length > 0) {
+            return res.status(JsonResponse.BAD_REQUEST).json({
+                ok: false,
+                errors
+            });
+        }
+
+        let productProviders = []
+        for (const provider of providers) {
+            productProviders.push({
+                product_id: product.product.id,
+                provider_id: provider
+            });
+        }
+
+        const createdProductProvider = await ProductController.productProviderQueries.create(productProviders);
+
+        if (!createdProductProvider.ok) {
+            return res.status(JsonResponse.BAD_REQUEST).json({
+                ok: false,
+                errors: [{message: "Existen problemas al momento de agregar los proveedores. Intente más tarde."}]
+            });
+        }
+
         return res.status(JsonResponse.OK).json({
             ok: true,
             message: 'El registro se actualizo correctamente'
-        });*/
+        });
     }
 
     public async delete(req: Request, res: Response) {

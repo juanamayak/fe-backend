@@ -14,9 +14,24 @@ export class ProductProviderQueries {
         }
     }
 
+    public async delete(providerId){
+        try {
+            let provider = await ProductProviderModel.destroy({
+                where: {
+                    id: providerId
+                }
+            });
+
+            return {ok: true};
+        } catch (e) {
+            console.log(e);
+            return {ok: false}
+        }
+    }
+
     public async getProductProviders(productId: any) {
         try {
-            let providers = await ProductModel.findAll(
+            let providers = await ProductProviderModel.findAll(
                 {
                     where: {
                         product_id: productId,

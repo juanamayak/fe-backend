@@ -17,6 +17,7 @@ export class ProductQueries {
                     { model: ProviderModel, as: 'providers'}
                 ]
             })
+
             return {ok: true, product}
         } catch (e) {
             console.log(e)
