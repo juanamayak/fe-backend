@@ -17,6 +17,8 @@ import {ProductProviderQueries} from "../queries/product_provider.queries";
 import {ImageQueries} from "../queries/image.queries";
 import {ProductSubcategoryQueries} from "../queries/product_subcategory.queries";
 import {random, randomInt} from "mathjs";
+import sequelize from "sequelize";
+import {database} from "../config/database";
 
 export class ProductController {
 
@@ -27,7 +29,7 @@ export class ProductController {
     static productQueries: ProductQueries = new ProductQueries();
     static imageQueries: ImageQueries = new ImageQueries();
 
-    public async show(req: Request, res: Response){
+    public async show(req: Request, res: Response) {
         const errors = [];
 
         const productUuid = !req.params.uuid || validator.isEmpty(req.params.uuid) ?
@@ -85,6 +87,7 @@ export class ProductController {
         const providers = req.body.providers;
         const subcategories = req.body.subcategories;
         const images = req.files.images;
+        const errors = [];
 
         // Validacion del request
         const validatedData = await ProductController.productsValidator.validateStore(body);
@@ -117,37 +120,30 @@ export class ProductController {
             });
         }
 
-        let productProviders = []
-        for (const provider of providers) {
-            productProviders.push({
+        const transaction = await database.transaction();
+        try {
+            let productProviders = providers.map(providerId => ({
                 product_id: createdProduct.product.id,
-                provider_id: provider
-            });
+                provider_id: providerId
+            }));
+
+            await ProductController.productProviderQueries.create(productProviders, {transaction});
+
+            let productSubcategories = subcategories.map(subcategoryId => ({
+                product_id: createdProduct.product.id,
+                provider_id: subcategoryId
+            }));
+
+            await ProductController.productSubcategoryQueries.create(productSubcategories, {transaction});
+        } catch (e) {
+            await transaction.rollback();
+            errors.push({message: 'Se encontro un error a la hora de crear los proveedores y/o subcategorias'});
         }
 
-        const createdProductProvider = await ProductController.productProviderQueries.create(productProviders);
-
-        if (!createdProductProvider.ok) {
+        if (errors.length > 0) {
             return res.status(JsonResponse.BAD_REQUEST).json({
                 ok: false,
-                errors: [{message: "Existen problemas al momento de agregar los proveedores. Intente más tarde."}]
-            });
-        }
-
-        let productSubcategories = []
-        for (const subcategory of subcategories) {
-            productSubcategories.push({
-                product_id: createdProduct.product.id,
-                subcategory_id: subcategory
-            });
-        }
-
-        const createdProductSubcategory = await ProductController.productSubcategoryQueries.create(productSubcategories);
-
-        if (!createdProductSubcategory.ok) {
-            return res.status(JsonResponse.BAD_REQUEST).json({
-                ok: false,
-                errors: [{message: "Existen problemas al momento de agregar las subcategorias. Intente más tarde."}]
+                errors
             });
         }
 
@@ -156,7 +152,7 @@ export class ProductController {
             return res.status(JsonResponse.BAD_REQUEST).json({
                 ok: false,
                 errors: productImagesCreated.errors
-            })
+            });
         }
 
         return res.status(JsonResponse.OK).json({
@@ -170,6 +166,7 @@ export class ProductController {
         const body = req.body;
         const providers = req.body.providers;
         const subcategories = req.body.subcategories;
+        const images = req.files.images;
         const errors = [];
 
         const productUuid = !req.params.uuid || validator.isEmpty(req.params.uuid) ?
@@ -217,7 +214,7 @@ export class ProductController {
             description: body.description
         }
 
-        const productUpdated = await ProductController.productQueries.update(product.product.id, body);
+        const productUpdated = await ProductController.productQueries.update(product.product.id, data);
 
         if (!productUpdated.product) {
             errors.push({message: 'Se encontro un problema a la hora de actualizar el producto. Intente de nuevamente'});
@@ -234,9 +231,9 @@ export class ProductController {
         const currentProductProviders = await ProductController.productProviderQueries.getProductProviders(product.product.id);
 
         if (!currentProductProviders.ok) {
-            errors.push({message: 'Existen problemas al buscar el registro solicitado'});
+            errors.push({message: 'Existen problemas al obtener los proveedores actuales'});
         } else if (!currentProductProviders.providers) {
-            errors.push({message: 'El registro no se encuentra dado de alta'});
+            errors.push({message: 'Los proveedores no se encontraron'});
         }
 
         if (errors.length > 0) {
@@ -246,35 +243,94 @@ export class ProductController {
             });
         }
 
-        for (const provider of currentProductProviders.providers) {
-            try {
-                await ProductController.productProviderQueries.delete(provider.id);
-            } catch (e) {
-                errors.push({message: `Error eliminando proveedor ${provider.id}: ${e.message}`});
+        // Obtenemos subcategorias que tiene el producto
+        const currentProductSubcategories = await ProductController.productSubcategoryQueries.getProductSubcategories(product.product.id);
+
+        if (!currentProductSubcategories.ok) {
+            errors.push({message: 'Existen problemas al obtener las subcategorias actuales'});
+        } else if (!currentProductProviders.providers) {
+            errors.push({message: 'Las subcategorias no se encontraron'});
+        }
+
+        if (errors.length > 0) {
+            return res.status(JsonResponse.BAD_REQUEST).json({
+                ok: false,
+                errors
+            });
+        }
+
+        // Obtenemos las imagenes actuales del producto
+        const currentProductImages = await ProductController.imageQueries.productImages({
+            imageable_id: product.product.id
+        });
+
+        if (!currentProductImages.ok) {
+            return res.status(JsonResponse.BAD_REQUEST).json({
+                ok: false,
+                errors: [{message: "Existen problemas al momento de obtener las imagenes del producto"}]
+            })
+        }
+
+        const transaction = await database.transaction({autocommit: false});
+        try {
+            // Recorremos las subcategorias actuales
+            for (const image of currentProductImages.images) {
+                // Eliminados cada uno de ellos
+                await ProductController.file.destroy(image.path, 'product')
+                await ProductController.imageQueries.delete(image.id, transaction);
             }
+
+            // Recorremos las subcategorias actuales
+            for (const subcategory of currentProductSubcategories.subcategories) {
+                // Eliminados cada uno de ellos
+                await ProductController.productSubcategoryQueries.delete(subcategory.id, transaction);
+            }
+
+            // Recorremos los proveedores actuales
+            for (const provider of currentProductProviders.providers) {
+                // Eliminados cada uno de ellos
+                await ProductController.productProviderQueries.delete(provider.id, transaction);
+            }
+
+            // Crear nuevos registros de proveedores
+            let productProviders = []
+            for (const provider of providers) {
+                productProviders.push({
+                    product_id: product.product.id,
+                    provider_id: provider
+                });
+            }
+
+            // Se insertan los nuevos proveedores que se envian
+            await ProductController.productProviderQueries.create(productProviders, transaction);
+
+            // Crear nuevos registros de subcategorias
+            let productSubcategories = []
+            for (const subcategory of subcategories) {
+                productSubcategories.push({
+                    product_id: product.product.id,
+                    subcategory_id: subcategory
+                });
+            }
+
+            // Se insertan las nuevas subcategorias que se envian
+            await ProductController.productSubcategoryQueries.create(productSubcategories, transaction);
+
+            // Se insertan las nuevas imagenes
+            await ProductController.processImages(images, product.product);
+
+            // Si todas las eliminaciones son exitosas, confirmar la transacción
+            await transaction.commit();
+        } catch (e) {
+            await transaction.rollback();
+            console.log('Error a las: ' + moment().format('YYYY-MM-DD HH:mm:ss') + ', ' + e);
+            errors.push({message: 'Se encontro un error a la hora de actualizar los proveedores y/o subcategorias'});
         }
 
         if (errors.length > 0) {
             return res.status(JsonResponse.BAD_REQUEST).json({
                 ok: false,
                 errors
-            });
-        }
-
-        let productProviders = []
-        for (const provider of providers) {
-            productProviders.push({
-                product_id: product.product.id,
-                provider_id: provider
-            });
-        }
-
-        const createdProductProvider = await ProductController.productProviderQueries.create(productProviders);
-
-        if (!createdProductProvider.ok) {
-            return res.status(JsonResponse.BAD_REQUEST).json({
-                ok: false,
-                errors: [{message: "Existen problemas al momento de agregar los proveedores. Intente más tarde."}]
             });
         }
 
@@ -315,7 +371,7 @@ export class ProductController {
             });
         }
 
-        const deletedProduct = await ProductController.productQueries.delete(product.product.id, { status: 0});
+        const deletedProduct = await ProductController.productQueries.delete(product.product.id, {status: 0});
 
         if (!deletedProduct.ok) {
             errors.push({message: 'Existen problemas al momento de eliminar el registro. Intente de nuevamente'});
@@ -363,17 +419,17 @@ export class ProductController {
             imageable_id: product.product.id
         })
 
-        if(!images.ok) {
+        if (!images.ok) {
             return res.status(JsonResponse.BAD_REQUEST).json({
                 ok: false,
                 errors: [{message: "Existen problemas al momento de obtener los archivos de evidencia del operador."}]
             })
         }
         let downloadedImages: any;
-        if(images.images && images.images.length > 0) {
+        if (images.images && images.images.length > 0) {
             downloadedImages = await ProductController.downloadImages(images.images);
 
-            if(!downloadedImages.ok) {
+            if (!downloadedImages.ok) {
                 return res.status(JsonResponse.BAD_REQUEST).json({
                     ok: false,
                     errors: downloadedImages.errors
@@ -383,17 +439,49 @@ export class ProductController {
 
         return res.status(JsonResponse.OK).json({
             ok: true,
-            images: downloadedImages.base64Images
-        })
+            images: downloadedImages ? downloadedImages.base64Images : []
+        });
     }
 
     private static async processImages(images: any, product: any) {
-        for (const image of images) {
-            console.log(image);
-            const imageExtension = image.name.toLowerCase().substring(image.name.lastIndexOf('.'));
-            const imageName = `P-${moment().unix()}-${randomInt(1,99)}-${product.id}${imageExtension}`;
+        // TODO: Refactorizar función
+        if(Array.isArray(images)) {
+            for (const image of images) {
+                const imageExtension = image.name.toLowerCase().substring(image.name.lastIndexOf('.'));
+                const imageName = `p-${uuidv4()}-${product.id}${imageExtension}`;
 
-            const imageUploaded = await ProductController.file.upload(image, imageName, 'product')
+                const imageUploaded = await ProductController.file.upload(image, imageName, 'product');
+
+                if (!imageUploaded.ok) {
+                    return {
+                        ok: false,
+                        errors: [{message: imageUploaded.message}]
+                    }
+                }
+
+                const data = {
+                    path: process.env.PROD_IMAGES_PATH + imageName,
+                    name: imageName,
+                    media_type: image.mimetype,
+                    imageable_type: 'PRODUCT',
+                    imageable_id: product.id
+                }
+
+                const imageCreated = await ProductController.imageQueries.create(data);
+
+                if (!imageCreated.ok) {
+                    return {
+                        ok: false,
+                        errors: [{message: 'Existen problemas al momento de procesar las imagenes del producto.'}]
+                    }
+                }
+
+            }
+        } else {
+            const imageExtension = images.name.toLowerCase().substring(images.name.lastIndexOf('.'));
+            const imageName = `p-${uuidv4()}-${product.id}${imageExtension}`;
+
+            const imageUploaded = await ProductController.file.upload(images, imageName, 'product');
 
             if (!imageUploaded.ok) {
                 return {
@@ -405,7 +493,7 @@ export class ProductController {
             const data = {
                 path: process.env.PROD_IMAGES_PATH + imageName,
                 name: imageName,
-                media_type: image.mimetype,
+                media_type: images.mimetype,
                 imageable_type: 'PRODUCT',
                 imageable_id: product.id
             }
@@ -418,8 +506,8 @@ export class ProductController {
                     errors: [{message: 'Existen problemas al momento de procesar las imagenes del producto.'}]
                 }
             }
-
         }
+
         return {ok: true}
     }
 
@@ -432,19 +520,19 @@ export class ProductController {
                 if (!downloadedImage.ok) {
                     return {
                         ok: false,
-                        errors: [{ message: "Existen problemas al momento de obtener el archivo."}]
+                        errors: [{message: "Existen problemas al momento de obtener el archivo."}]
                     }
                 }
 
                 base64Images.push(downloadedImage.image)
 
             }
-            return { ok: true, base64Images }
+            return {ok: true, base64Images}
         } catch (e) {
             console.log(e)
             return {
                 ok: false,
-                errors: [{ message: "Existen problemas al momento de obtener los archivos de la evidencia." }]
+                errors: [{message: "Existen problemas al momento de obtener los archivos de la evidencia."}]
             }
         }
     }

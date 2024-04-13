@@ -13,7 +13,7 @@ export class ImagesController {
     static imagesQueries: ImageQueries = new ImageQueries();
 
     public async index(req: Request, res: Response) {
-        let addresses = await ImagesController.imagesQueries.index()
+        /*let addresses = await ImagesController.imagesQueries.index()
 
         if (!addresses.ok) {
             return res.status(JsonResponse.BAD_REQUEST).json({
@@ -25,7 +25,7 @@ export class ImagesController {
         return res.status(JsonResponse.OK).json({
             ok: true,
             countries: addresses.addresses,
-        })
+        })*/
     }
 
     public async store(req: Request, res: Response) {

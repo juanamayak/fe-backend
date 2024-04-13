@@ -20,8 +20,8 @@ export class ImageQueries {
 
     public async index() {
         try {
-            let addresses = await AddressModel.findAll({order: [["createdAt", "ASC"]]})
-            return {ok: true, addresses}
+            let images = await AddressModel.findAll()
+            return {ok: true, images}
         } catch (e) {
             console.log(e)
             return {ok: false}
@@ -53,14 +53,13 @@ export class ImageQueries {
         }
     }
 
-    public async delete(addressId: any, data: any) {
+    public async delete(imageId: any, data: any) {
         try {
-            let address = await AddressModel.update(
-                data, {
-                    where: {
-                        id: addressId,
-                    }
-                })
+            await ImageModel.destroy({
+                where: {
+                    id: imageId,
+                }
+            })
             return {ok: true}
         } catch (e) {
             console.log(e)

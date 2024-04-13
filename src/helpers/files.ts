@@ -55,6 +55,7 @@ export class File {
             }
         })
 
+
         return {ok: true, imageName}
     }
 
@@ -80,14 +81,13 @@ export class File {
 
     }
 
-    public async destroy(name, type) {
-        let path: string = (type == 'documentacion') ? process.env.DOCUMENTATION_PATH : null
-
+    public async destroy(path, type) {
         try {
-            return {ok: true, pdf: fs.unlinkSync(path + name)}
+            fs.unlinkSync(path);
+            return {ok: true}
         } catch (e) {
-            console.log('Error files a las: ' + moment().format('YYYY-MM-DD HH:mm:ss') + ', ' + e)
-            return {ok: false, message: 'Existen problemas al momento de eliminar el pdf!'}
+            console.log('Error files a las: ' + moment().format('YYYY-MM-DD HH:mm:ss') + ', ' + e);
+            return {ok: false, message: 'Existen problemas al momento de eliminar la imagen!'}
         }
     }
 }

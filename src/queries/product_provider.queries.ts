@@ -4,9 +4,9 @@ import {ProductModel} from "../models/product.model";
 
 export class ProductProviderQueries {
 
-    public async create(data) {
+    public async create(data, transaction) {
         try {
-            let productProvider = await ProductProviderModel.bulkCreate(data);
+            let productProvider = await ProductProviderModel.bulkCreate(data, transaction);
             return {ok: true}
         } catch (e) {
             console.log(e)
@@ -14,12 +14,13 @@ export class ProductProviderQueries {
         }
     }
 
-    public async delete(providerId){
+    public async delete(providerId, transaction) {
         try {
             let provider = await ProductProviderModel.destroy({
                 where: {
                     id: providerId
-                }
+                },
+                transaction
             });
 
             return {ok: true};
