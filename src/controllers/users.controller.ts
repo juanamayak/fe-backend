@@ -257,16 +257,14 @@ export class UsersController {
         const userExists = await UsersController.userQueries.findClientByEmail(body.email);
 
         if (!userExists.ok) {
-            errors.push({message: 'Existen problemas al momento de verificar si el usuario esta dado de alta.'});
-        } else if ([0, -2].includes(userExists.user.status)){
-            errors.push({message: 'Su cuenta aún no ha sido verificada o esta dada de baja'});
-        }/*else if (!userExists.user) {
-            errors.push({message: 'El email proporcionado no se encuentra dado de alta en el sistema.'});
-        } else if (!userExists.user && !bcrypt.compareSync(body.password, userExists.user.password)) {
-            errors.push({message: 'Las credenciales no coinciden. Intentalo nuevamente.'});
-        }*/
-
-        console.log(errors);
+            errors.push({message: 'Se encontraron algunos errores al iniciar la sesión. Por favor, inténtalo de nuevo más tarde o contacta con soporte si el problema persiste.'});
+        } else if (!userExists.user) {
+            errors.push({message: 'Error al verificar la existencia del usuario.'});
+        } else if (!bcrypt.compareSync(body.password, userExists.user.password)) {
+            errors.push({message: 'Email o contraseña incorrectos.'});
+        } else if ([0, -2].includes(userExists.user.status)) {
+            errors.push({message: 'Su cuenta aún no ha sido verificada o ha sido dada de baja.'});
+        }
 
         if (errors.length > 0) {
             return res.status(JsonResponse.BAD_REQUEST).json({

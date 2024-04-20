@@ -8,6 +8,7 @@ import {ClientValidator} from "../validators/client.validator";
 import {ClientQueries} from "../queries/client.queries";
 import {Payload} from "../helpers/payload";
 import {Mailer} from "../helpers/mailer";
+import {UsersController} from "./users.controller";
 
 export class ClientController {
     static salt = bcrypt.genSaltSync(Number(process.env.NO_SALT));
@@ -52,8 +53,9 @@ export class ClientController {
             email: body.email,
             password: bcrypt.hashSync(body.password, ClientController.salt),
             cellphone: body.cellphone,
-            terms_and_conditions: body.terms_and_conditions,
-            status: 1
+            terms_and_conditions: body.terms_and_conditions ? '1' : '0',
+            verification_code: moment().unix(),
+            status: 0
         }
 
         const clientCreated = await ClientController.clientQueries.create(data)
@@ -94,11 +96,13 @@ export class ClientController {
         const clientExists = await ClientController.clientQueries.findClientByEmail(body.email);
 
         if (!clientExists.ok) {
-            errors.push({message: 'Existen problemas al momento de verificar si el usuario esta dado de alta.'});
-        } else if (!clientExists) {
-            errors.push({message: 'El email proporcionado no se encuentra dado de alta en el sistema.'});
-        } else if (!clientExists && !bcrypt.compareSync(body.password, clientExists.client.password)) {
-            errors.push({message: 'Las credenciales no coinciden. Intentalo nuevamente.'});
+            errors.push({message: 'Se encontraron algunos errores al iniciar la sesión. Por favor, inténtalo de nuevo más tarde o contacta con soporte si el problema persiste.'});
+        } else if (!clientExists.client) {
+            errors.push({message: 'Error al verificar la existencia del usuario.'});
+        } else if (!bcrypt.compareSync(body.password, clientExists.client.password)) {
+            errors.push({message: 'Email o contraseña incorrectos.'});
+        } else if ([0, -2].includes(clientExists.client.status)) {
+            errors.push({message: 'Su cuenta aún no ha sido verificada o ha sido dada de baja.'});
         }
 
         if (errors.length > 0) {
@@ -131,6 +135,75 @@ export class ClientController {
         return res.status(JsonResponse.OK).json({
             ok: true,
             token: JWTCreated ? JWTCreated.token : false
+        });
+    }
+
+    public async verify(req: Request, res: Response){
+        const body = req.body;
+        const errors = [];
+
+        const userUuid = !req.params.uuid || validator.isEmpty(req.params.uuid) ?
+            errors.push({message: 'El usuario es obligatorio.'}) : req.params.uuid;
+
+        const verificationCode = !req.params.code || validator.isEmpty(req.params.code) ?
+            errors.push({message: 'El código de verificación es obligatorio.'}) : req.params.code;
+
+        if (errors.length > 0) {
+            return res.status(JsonResponse.BAD_REQUEST).json({
+                ok: false,
+                errors
+            });
+        }
+
+        const user = await ClientController.clientQueries.show({
+            uuid: userUuid
+        });
+
+        if (!user.ok) {
+            errors.push({message: 'Existen problemas al buscar el registro solicitado'});
+        } else if (!user.user) {
+            errors.push({message: 'El registro no se encuentra dado de alta'});
+        }
+
+        if (errors.length > 0) {
+            return res.status(JsonResponse.BAD_REQUEST).json({
+                ok: false,
+                errors
+            });
+        }
+
+        if (verificationCode !== user.user.verification_code) {
+            errors.push({message: 'El código de verficación es incorrecto'});
+        }
+
+        if (errors.length > 0) {
+            return res.status(JsonResponse.BAD_REQUEST).json({
+                ok: false,
+                errors
+            });
+        }
+
+        const data = {
+            account_verified: '1',
+            status: 1
+        }
+
+        const verifiedAccount = await ClientController.clientQueries.update(user.user.id, data);
+
+        if (!verifiedAccount.user) {
+            errors.push({message: 'Se encontro un problema a la hora de activar la cuenta. Intente de nuevamente'});
+        }
+
+        if (errors.length > 0) {
+            return res.status(JsonResponse.BAD_REQUEST).json({
+                ok: false,
+                errors
+            });
+        }
+
+        return res.status(JsonResponse.OK).json({
+            ok: true,
+            message: 'El usuario se verifico y activo correctamente'
         });
     }
 }

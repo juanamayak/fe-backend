@@ -14,11 +14,12 @@ export class ClientModel extends Model {
     public password: string;
     public birthday: string;
     public cellphone: number;
-    public newsletter: number;
+    public newsletter: string;
     public terms_and_conditions: number;
     public facebook_id: string;
     public facebook_token: string;
-    public email_verfied_at: string;
+    public verification_code: number;
+    public account_verified: string;
     public status: number;
     public createdAt: string;
     public updatedAt: string;
@@ -64,10 +65,13 @@ ClientModel.init({
         type: DataTypes.INTEGER
     },
     newsletter: {
-        type: DataTypes.INTEGER
+        type: DataTypes.STRING
     },
     terms_and_conditions: {
-        type: DataTypes.INTEGER
+        type: DataTypes.STRING
+    },
+    verification_code: {
+        type: DataTypes.STRING
     },
     facebook_id: {
         type: DataTypes.STRING
@@ -75,9 +79,8 @@ ClientModel.init({
     facebook_token: {
         type: DataTypes.TEXT
     },
-    email_verified_at: {
-        type: DataTypes.DATE,
-        allowNull: true
+    account_verified: {
+        type: DataTypes.STRING,
     },
     status: {
         type: DataTypes.INTEGER

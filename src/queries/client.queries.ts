@@ -2,17 +2,18 @@ import {Op} from 'sequelize'
 import {AddressModel} from '../models/address.model'
 import {ClientModel} from "../models/client.model";
 import {ClientController} from "../controllers/client.controller";
+import {UserModel} from "../models/user.model";
 
 export class ClientQueries {
 
     public async show(data: any) {
         try {
-            const address = await AddressModel.findOne({
+            const user = await ClientModel.findOne({
                 where: {
                     uuid: data.uuid
                 }
             })
-            return {ok: true, address}
+            return {ok: true, user}
         } catch (e) {
             console.log(e)
             return {ok: false}
@@ -39,15 +40,15 @@ export class ClientQueries {
         }
     }
 
-    public async update(addressId: any, data: any) {
+    public async update(userId: any, data: any) {
         try {
-            let address = await AddressModel.update(
+            let user = await ClientModel.update(
                 data, {
                     where: {
-                        id: addressId,
+                        id: userId,
                     }
                 })
-            return {ok: true, address}
+            return {ok: true, user}
         } catch (e) {
             console.log(e)
             return {ok: false}
