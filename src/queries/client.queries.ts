@@ -11,7 +11,8 @@ export class ClientQueries {
             const user = await ClientModel.findOne({
                 where: {
                     uuid: data.uuid
-                }
+                },
+                attributes: ['name', 'lastname', 'email', 'birthday', 'cellphone', 'country_id', 'state_id', 'city_id', 'address', 'zip']
             })
             return {ok: true, user}
         } catch (e) {

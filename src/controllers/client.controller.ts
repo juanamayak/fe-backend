@@ -17,6 +17,42 @@ export class ClientController {
     static payload: Payload = new Payload();
     static mailer: Mailer = new Mailer();
 
+    public async show(req: Request, res: Response) {
+        const errors = [];
+
+        const userUuid = !req.params.uuid || validator.isEmpty(req.params.uuid) ?
+            errors.push({message: 'Favor de proporcionar el usuario'}) : req.params.uuid;
+
+        if (errors.length > 0) {
+            return res.status(JsonResponse.BAD_REQUEST).json({
+                ok: false,
+                errors
+            });
+        }
+
+        const user = await ClientController.clientQueries.show({
+            uuid: userUuid
+        });
+
+        if (!user.ok) {
+            errors.push({message: 'Existen problemas al buscar el registro solicitado'});
+        } else if (!user.user) {
+            errors.push({message: 'El registro no se encuentra dado de alta'});
+        }
+
+        if (errors.length > 0) {
+            return res.status(JsonResponse.BAD_REQUEST).json({
+                ok: false,
+                errors
+            });
+        }
+
+        return res.status(JsonResponse.OK).json({
+            ok: true,
+            user: user.user
+        });
+    }
+
     public async index(req: Request, res: Response) {
         let clients = await ClientController.clientQueries.index()
 
@@ -134,7 +170,8 @@ export class ClientController {
 
         return res.status(JsonResponse.OK).json({
             ok: true,
-            token: JWTCreated ? JWTCreated.token : false
+            token: JWTCreated ? JWTCreated.token : false,
+            uuid: clientExists.client.uuid
         });
     }
 
