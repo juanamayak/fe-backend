@@ -271,7 +271,7 @@ export class ClientController {
 
         const data = {
             user_type: 'client',
-            user_id: clientExists.client ? clientExists.client.id.toString() : false
+            client_id: clientExists.client ? clientExists.client.id.toString() : false
         }
 
         /* Creamos el JWT del cliente */

@@ -31,7 +31,6 @@ export class AddressController {
 
     public async store(req: Request, res: Response) {
         const body = req.body;
-
         const client_id = req.body.client_id;
 
         // Validacion del request
@@ -54,12 +53,14 @@ export class AddressController {
             phone_receiver: body.phone_receiver,
             address: body.address,
             colony: body.colony,
-            reference: body.reference,
+            references: body.references,
             latitude: body.latitude,
             longitude: body.longitude,
             zip: body.zip,
             status: 1
         }
+
+        console.log(data);
 
         let addressCreated = await AddressController.addressesQueries.create(data);
 

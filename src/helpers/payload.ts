@@ -18,11 +18,11 @@ export class Payload {
             const cryptr = new Cryptr(process.env.CRYPTR_KEY || '')
 
             if (data.user_type === 'client') {
-                const userId = cryptr.encrypt((data.user_id));
+                const userId = cryptr.encrypt((data.client_id));
                 const userType = cryptr.encrypt((data.user_type));
 
                 const token = jwt.sign({
-                    user_id: userId,
+                    client_id: userId,
                     user_type: userType
                 }, privateKey, {algorithm: 'RS256', expiresIn: '9h'})
 

@@ -88,7 +88,7 @@ export class Routes {
 
         /* RUTAS DIRECCIONES */
         app.route('/api/addresses').get(this.addressController.index);
-        app.route('/api/addresses/create').post(this.addressController.store);
+        app.route('/api/addresses/create').post(CheckHeaders.validateJWTClient, this.addressController.store);
         app.route('/api/addresses/update').post(this.addressController.update);
         app.route('/api/addresses/delete').post(this.addressController.delete);
 
