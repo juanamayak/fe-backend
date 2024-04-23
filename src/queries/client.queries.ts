@@ -8,13 +8,13 @@ export class ClientQueries {
 
     public async show(data: any) {
         try {
-            const user = await ClientModel.findOne({
+            const client = await ClientModel.findOne({
                 where: {
                     uuid: data.uuid
                 },
-                attributes: ['name', 'lastname', 'email', 'birthday', 'cellphone', 'country_id', 'state_id', 'city_id', 'address', 'zip']
+                attributes: ['id', 'name', 'lastname', 'email', 'birthday', 'cellphone', 'verification_code', 'country_id', 'state_id', 'city_id', 'address', 'zip']
             })
-            return {ok: true, user}
+            return {ok: true, client}
         } catch (e) {
             console.log(e)
             return {ok: false}
@@ -41,15 +41,15 @@ export class ClientQueries {
         }
     }
 
-    public async update(userId: any, data: any) {
+    public async update(clientId: any, data: any) {
         try {
-            let user = await ClientModel.update(
+            let client = await ClientModel.update(
                 data, {
                     where: {
-                        id: userId,
+                        id: clientId,
                     }
                 })
-            return {ok: true, user}
+            return {ok: true, client}
         } catch (e) {
             console.log(e)
             return {ok: false}

@@ -30,13 +30,14 @@ export class ClientController {
             });
         }
 
-        const user = await ClientController.clientQueries.show({
+        const client = await ClientController.clientQueries.show({
             uuid: userUuid
         });
 
-        if (!user.ok) {
+
+        if (!client.ok) {
             errors.push({message: 'Existen problemas al buscar el registro solicitado'});
-        } else if (!user.user) {
+        } else if (!client.client) {
             errors.push({message: 'El registro no se encuentra dado de alta'});
         }
 
@@ -49,7 +50,7 @@ export class ClientController {
 
         return res.status(JsonResponse.OK).json({
             ok: true,
-            user: user.user
+            client: client.client
         });
     }
 
@@ -112,6 +113,125 @@ export class ClientController {
         return res.status(JsonResponse.OK).json({
             ok: true,
             message: 'Su cuenta se ha creado de forma exitosa.'
+        });
+    }
+
+    public async update(req: Request, res: Response) {
+        const body = req.body;
+        console.log(body);
+        const errors = [];
+
+        const clientUuid = !req.params.uuid || validator.isEmpty(req.params.uuid) ?
+            errors.push({message: 'Favor de proporcionar el usuario'}) : req.params.uuid;
+
+        if (errors.length > 0) {
+            return res.status(JsonResponse.BAD_REQUEST).json({
+                ok: false,
+                errors
+            });
+        }
+
+        // Validacion del request
+        const validatedData = await ClientController.clientValidator.validateUpdate(body);
+
+        if (!validatedData.ok) {
+            return res.status(JsonResponse.BAD_REQUEST).json({
+                ok: false,
+                errors: validatedData.errors
+            });
+        }
+
+        const client = await ClientController.clientQueries.show({
+            uuid: clientUuid
+        });
+
+        if (!client.ok) {
+            errors.push({message: 'Existen problemas al buscar el registro solicitado'});
+        } else if (!client.client) {
+            errors.push({message: 'El registro no se encuentra dado de alta'});
+        }
+
+        if (errors.length > 0) {
+            return res.status(JsonResponse.BAD_REQUEST).json({
+                ok: false,
+                errors
+            });
+        }
+
+        const updatedClient = await ClientController.clientQueries.update(client.client.id, body);
+
+        if (!updatedClient.client) {
+            errors.push({message: 'Existen problemas al momento de actualizar el registro. Intente de nuevamente'});
+        }
+        if (errors.length > 0) {
+            return res.status(JsonResponse.BAD_REQUEST).json({
+                ok: false,
+                errors
+            });
+        }
+
+        return res.status(JsonResponse.OK).json({
+            ok: true,
+            message: 'Tu información se actualizo correctamente'
+        });
+    }
+
+    public async addressUpdate(req: Request, res: Response) {
+        const body = req.body;
+        const errors = [];
+
+        const clientUuid = !req.params.uuid || validator.isEmpty(req.params.uuid) ?
+            errors.push({message: 'Favor de proporcionar el usuario'}) : req.params.uuid;
+
+        if (errors.length > 0) {
+            return res.status(JsonResponse.BAD_REQUEST).json({
+                ok: false,
+                errors
+            });
+        }
+
+        // Validacion del request
+        const validatedData = await ClientController.clientValidator.validateUpdateAddress(body);
+
+        if (!validatedData.ok) {
+            return res.status(JsonResponse.BAD_REQUEST).json({
+                ok: false,
+                errors: validatedData.errors
+            });
+        }
+
+        const client = await ClientController.clientQueries.show({
+            uuid: clientUuid
+        });
+
+        if (!client.ok) {
+            errors.push({message: 'Existen problemas al buscar el registro solicitado'});
+        } else if (!client.client) {
+            errors.push({message: 'El registro no se encuentra dado de alta'});
+        }
+
+        if (errors.length > 0) {
+            return res.status(JsonResponse.BAD_REQUEST).json({
+                ok: false,
+                errors
+            });
+        }
+
+        const updatedClient = await ClientController.clientQueries.update(client.client.id, body);
+
+        if (!updatedClient.client) {
+            errors.push({message: 'Existen problemas al momento de actualizar el registro. Intente de nuevamente'});
+        }
+        if (errors.length > 0) {
+            return res.status(JsonResponse.BAD_REQUEST).json({
+                ok: false,
+                errors
+            });
+        }
+
+        return res.status(JsonResponse.OK).json({
+            ok: true,
+            message: 'Tu información se actualizo correctamente'
         });
     }
 
@@ -179,7 +299,7 @@ export class ClientController {
         const body = req.body;
         const errors = [];
 
-        const userUuid = !req.params.uuid || validator.isEmpty(req.params.uuid) ?
+        const clientUuid = !req.params.uuid || validator.isEmpty(req.params.uuid) ?
             errors.push({message: 'El usuario es obligatorio.'}) : req.params.uuid;
 
         const verificationCode = !req.params.code || validator.isEmpty(req.params.code) ?
@@ -192,13 +312,13 @@ export class ClientController {
             });
         }
 
-        const user = await ClientController.clientQueries.show({
-            uuid: userUuid
+        const client = await ClientController.clientQueries.show({
+            uuid: clientUuid
         });
 
-        if (!user.ok) {
+        if (!client.ok) {
             errors.push({message: 'Existen problemas al buscar el registro solicitado'});
-        } else if (!user.user) {
+        } else if (!client.client) {
             errors.push({message: 'El registro no se encuentra dado de alta'});
         }
 
@@ -209,7 +329,7 @@ export class ClientController {
             });
         }
 
-        if (verificationCode !== user.user.verification_code) {
+        if (verificationCode !== client.client.verification_code) {
             errors.push({message: 'El código de verficación es incorrecto'});
         }
 
@@ -225,9 +345,9 @@ export class ClientController {
             status: 1
         }
 
-        const verifiedAccount = await ClientController.clientQueries.update(user.user.id, data);
+        const verifiedAccount = await ClientController.clientQueries.update(client.client.id, data);
 
-        if (!verifiedAccount.user) {
+        if (!verifiedAccount.client) {
             errors.push({message: 'Se encontro un problema a la hora de activar la cuenta. Intente de nuevamente'});
         }
 

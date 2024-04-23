@@ -44,6 +44,8 @@ export class Routes {
         app.route('/api/clients').get(this.clientController.index);
         app.route('/api/clients/login').post(this.clientController.login);
         app.route('/api/clients/register').post(this.clientController.store);
+        app.route('/api/clients/update/:uuid').post(this.clientController.update);
+        app.route('/api/clients/update/address/:uuid').post(this.clientController.addressUpdate);
         app.route('/api/clients/verify/:uuid/:code').get(this.clientController.verify);
 
         /* RUTAS DE CATEGORIAS */
