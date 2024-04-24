@@ -25,7 +25,7 @@ export class AddressController {
 
         return res.status(JsonResponse.OK).json({
             ok: true,
-            countries: addresses.addresses,
+            addresses: addresses.addresses,
         })
     }
 

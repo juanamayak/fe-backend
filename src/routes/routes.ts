@@ -89,8 +89,8 @@ export class Routes {
         /* RUTAS DIRECCIONES */
         app.route('/api/addresses').get(this.addressController.index);
         app.route('/api/addresses/create').post(CheckHeaders.validateJWTClient, this.addressController.store);
-        app.route('/api/addresses/update').post(this.addressController.update);
-        app.route('/api/addresses/delete').post(this.addressController.delete);
+        app.route('/api/addresses/update/:uuid').put(this.addressController.update);
+        app.route('/api/addresses/delete/:uuid').put(this.addressController.delete);
 
         /* RUTAS DEDICATORIAS */
         app.route('/api/dedications').get(this.messagesController.index);

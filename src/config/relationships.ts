@@ -39,6 +39,15 @@ export default class Relationship {
 
         ProductModel.hasMany(ImageModel, { foreignKey: 'imageable_id', scope: {imageable_type: 'PRODUCT'}, as: 'images' });
 
+        CountryModel.hasMany(AddressModel, { foreignKey: 'country_id', as: 'addresses'});
+        StateModel.hasMany(AddressModel, { foreignKey: 'state_id', as: 'addresses'});
+        CityModel.hasMany(AddressModel, { foreignKey: 'city_id', as: 'addresses'});
+
+
+        AddressModel.belongsTo(CountryModel, { foreignKey: 'country_id', as: 'country'});
+        AddressModel.belongsTo(StateModel, { foreignKey: 'state_id', as: 'state'});
+        AddressModel.belongsTo(CityModel, { foreignKey: 'city_id', as: 'city'});
+
         /* Relaciones de Categorias */
         CategoryModel.hasMany(SubcategoryModel, {foreignKey: 'category_id', as: 'subcategories'});
 

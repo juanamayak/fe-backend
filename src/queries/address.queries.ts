@@ -1,5 +1,8 @@
 import {Op} from 'sequelize'
 import {AddressModel} from '../models/address.model'
+import {CountryModel} from "../models/country.model";
+import {StateModel} from "../models/state.model";
+import {CityModel} from "../models/city.model";
 
 export class AddressQueries {
 
@@ -19,7 +22,16 @@ export class AddressQueries {
 
     public async index() {
         try {
-            let addresses = await AddressModel.findAll({order: [["createdAt", "ASC"]]})
+            let addresses = await AddressModel.findAll(
+                {
+                    order: [["createdAt", "ASC"]],
+                    include: [
+                        { model: CountryModel, as: 'country' },
+                        { model: StateModel, as: 'state' },
+                        { model: CityModel, as: 'city' }
+                    ]
+                },
+            )
             return {ok: true, addresses}
         } catch (e) {
             console.log(e)
