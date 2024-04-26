@@ -24,6 +24,9 @@ export class AddressQueries {
         try {
             let addresses = await AddressModel.findAll(
                 {
+                    where: {
+                        status: [1]
+                    },
                     order: [["createdAt", "ASC"]],
                     include: [
                         { model: CountryModel, as: 'country' },

@@ -60,8 +60,6 @@ export class AddressController {
             status: 1
         }
 
-        console.log(data);
-
         let addressCreated = await AddressController.addressesQueries.create(data);
 
         if (!addressCreated.ok) {
@@ -169,7 +167,7 @@ export class AddressController {
             });
         }
 
-        const deletedAddress = await AddressController.addressesQueries.delete(findedAdress.address.id, { status: 0});
+        const deletedAddress = await AddressController.addressesQueries.delete(findedAdress.address.id, { status: body.status});
 
         if (!deletedAddress.ok) {
             errors.push({message: 'Existen problemas al momento de eliminar el registro. Intente de nuevamente'});
@@ -181,7 +179,6 @@ export class AddressController {
                 errors
             });
         }
-
 
         return res.status(JsonResponse.OK).json({
             ok: true,
