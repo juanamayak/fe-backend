@@ -27,7 +27,7 @@ export class AddressQueries {
                     where: {
                         status: [1]
                     },
-                    order: [["createdAt", "ASC"]],
+                    order: [["createdAt", "DESC"]],
                     include: [
                         { model: CountryModel, as: 'country' },
                         { model: StateModel, as: 'state' },

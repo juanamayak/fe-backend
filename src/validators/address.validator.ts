@@ -30,11 +30,11 @@ export class AddressValidator {
             const references: string = !body.references || validator.isEmpty(body.references) ?
                 errors.push({message: 'La referencia es obligatoria'}) : body.references;
 
-            /*const latitude: string = !body.latitude || validator.isEmpty(body.latitude) ?
+            const latitude: string = !body.latitude ?
                 errors.push({message: 'La posición en el mapa es obligatorio'}) : body.latitude;
 
-            const longitude: string = !body.longitude || validator.isEmpty(body.longitude) ?
-                errors.push({message: 'La posición en el mapa es obligatorio'}) : body.longitude;*/
+            const longitude: string = !body.longitude ?
+                errors.push({message: 'La posición en el mapa es obligatorio'}) : body.longitude;
 
             const zip: number = !body.zip || validator.isEmpty(body.zip) ?
                 errors.push({message: 'El código postal es obligatorio'}) : body.zip;
