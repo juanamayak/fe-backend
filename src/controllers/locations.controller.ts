@@ -72,4 +72,26 @@ export class LocationsController {
             cities: cities.cities,
         })
     }
+
+    public async city(req: Request, res: Response) {
+        const body = req.body;
+        const errors = [];
+
+        const cityId = !req.params.id || validator.isEmpty(req.params.id) ?
+            errors.push({message: 'Favor de proporcionar la dirección'}) : req.params.id;
+
+        let city = await LocationsController.locationQueries.city(cityId);
+
+        if (!city.ok) {
+            return res.status(JsonResponse.BAD_REQUEST).json({
+                ok: false,
+                errors: [{message: 'Algo salio mal a la hora de traer los paises'}]
+            });
+        }
+
+        return res.status(JsonResponse.OK).json({
+            ok: true,
+            city: city.city,
+        })
+    }
 }

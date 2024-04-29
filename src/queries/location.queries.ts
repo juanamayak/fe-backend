@@ -42,4 +42,18 @@ export class LocationQueries {
             return {ok: false}
         }
     }
+
+    public async city(cityId) {
+        try {
+            let city = await CityModel.findOne({
+                where: {
+                    id: cityId
+                }
+            });
+            return {ok: true, city}
+        } catch (e) {
+            console.log(e)
+            return {ok: false}
+        }
+    }
 }

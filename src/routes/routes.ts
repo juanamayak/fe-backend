@@ -71,6 +71,7 @@ export class Routes {
         app.route('/api/countries').get(this.locationsController.countries);
         app.route('/api/states/:country_id').get(this.locationsController.states);
         app.route('/api/cities/:state_id').get(this.locationsController.cities);
+        app.route('/api/city/:id').get(this.locationsController.city);
 
         // RUTAS DE PRODUCTOS
         app.route('/api/products/:uuid').get(this.productController.show);
