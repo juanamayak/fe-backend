@@ -18,11 +18,16 @@ import {CategoryModel} from "../models/category.model";
 import {SubcategoryModel} from "../models/subcategory.model";
 import {ProviderModel} from "../models/provider.model";
 import {ImageModel} from "../models/image.model";
+import {ProductProviderModel} from "../models/product_provider.model";
 
 export default class Relationship {
     static init() {
 
-        ProductModel.belongsToMany(SubcategoryModel, { through: 'ProductSubcategoryModel', foreignKey: 'product_id', as: 'subcategories'});
+        ProductModel.belongsToMany(SubcategoryModel, {
+            through: 'ProductSubcategoryModel',
+            foreignKey: 'product_id',
+            as: 'subcategories'
+        });
         SubcategoryModel.belongsToMany(ProductModel, {
             through: 'ProductSubcategoryModel', // Nombre de la tabla intermedia
             foreignKey: 'subcategory_id', // Nombre de la columna que hace referencia al id de la subcategoría
@@ -30,23 +35,34 @@ export default class Relationship {
         });
 
 
-        ProductModel.belongsToMany(ProviderModel, { through: 'ProductProviderModel', foreignKey: 'product_id', as: 'providers'});
+        ProductModel.belongsToMany(ProviderModel, {
+            through: ProductProviderModel,
+            as: 'providers',
+            foreignKey: 'product_id',
+            otherKey: 'provider_id'
+        });
         ProviderModel.belongsToMany(ProductModel, {
-            through: 'ProductProviderModel', // Nombre de la tabla intermedia
-            foreignKey: 'provider_id', // Nombre de la columna que hace referencia al id de la subcategoría
-            as: 'products'
+            through: ProductProviderModel,
+            as: 'products',
+            foreignKey: 'provider_id',
+            otherKey: 'product_id'
+
         });
 
-        ProductModel.hasMany(ImageModel, { foreignKey: 'imageable_id', scope: {imageable_type: 'PRODUCT'}, as: 'images' });
+        ProductModel.hasMany(ImageModel, {
+            foreignKey: 'imageable_id',
+            scope: {imageable_type: 'PRODUCT'},
+            as: 'images'
+        });
 
-        CountryModel.hasMany(AddressModel, { foreignKey: 'country_id', as: 'addresses'});
-        StateModel.hasMany(AddressModel, { foreignKey: 'state_id', as: 'addresses'});
-        CityModel.hasMany(AddressModel, { foreignKey: 'city_id', as: 'addresses'});
+        CountryModel.hasMany(AddressModel, {foreignKey: 'country_id', as: 'addresses'});
+        StateModel.hasMany(AddressModel, {foreignKey: 'state_id', as: 'addresses'});
+        CityModel.hasMany(AddressModel, {foreignKey: 'city_id', as: 'addresses'});
 
 
-        AddressModel.belongsTo(CountryModel, { foreignKey: 'country_id', as: 'country'});
-        AddressModel.belongsTo(StateModel, { foreignKey: 'state_id', as: 'state'});
-        AddressModel.belongsTo(CityModel, { foreignKey: 'city_id', as: 'city'});
+        AddressModel.belongsTo(CountryModel, {foreignKey: 'country_id', as: 'country'});
+        AddressModel.belongsTo(StateModel, {foreignKey: 'state_id', as: 'state'});
+        AddressModel.belongsTo(CityModel, {foreignKey: 'city_id', as: 'city'});
 
         /* Relaciones de Categorias */
         CategoryModel.hasMany(SubcategoryModel, {foreignKey: 'category_id', as: 'subcategories'});
@@ -72,8 +88,6 @@ export default class Relationship {
         /* Relaciones de Carts */
         CartModel.belongsToMany(ProductModel, {through: 'CartProduct', foreignKey: 'cart_id'});
         ProductModel.belongsToMany(CartModel, {through: 'CartProduct', foreignKey: 'product_id'});
-
-
 
 
     }

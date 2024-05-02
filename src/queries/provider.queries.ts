@@ -1,6 +1,9 @@
 import {Op} from 'sequelize'
 import {ProviderModel} from "../models/provider.model";
 import {AddressModel} from "../models/address.model";
+import {CountryModel} from "../models/country.model";
+import {ProductModel} from "../models/product.model";
+import {ImageModel} from "../models/image.model";
 
 export class ProviderQueries {
 
@@ -67,6 +70,21 @@ export class ProviderQueries {
                     }
                 })
             return {ok: true}
+        } catch (e) {
+            console.log(e)
+            return {ok: false}
+        }
+    }
+
+    public async getProviderByCity(cityId){
+        try {
+            let providers = await ProviderModel.findAll(
+                {
+                    where: {
+                        city_id: cityId,
+                    },
+                })
+            return {ok: true, providers}
         } catch (e) {
             console.log(e)
             return {ok: false}

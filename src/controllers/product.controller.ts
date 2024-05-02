@@ -27,6 +27,8 @@ export class ProductController {
     static productProviderQueries: ProductProviderQueries = new ProductProviderQueries();
     static productSubcategoryQueries: ProductSubcategoryQueries = new ProductSubcategoryQueries();
     static productQueries: ProductQueries = new ProductQueries();
+    static categoryQueries: CategoryQueries = new CategoryQueries();
+    static providerQueries: ProviderQueries = new ProviderQueries();
     static imageQueries: ImageQueries = new ImageQueries();
 
     public async show(req: Request, res: Response) {
@@ -389,6 +391,63 @@ export class ProductController {
             ok: true,
             message: 'El registro se elimino correctamente.'
         });
+    }
+
+    public async productsByCategory(req: Request, res: Response) {
+        const errors = [];
+
+        const categoryUuid = !req.params.category_uuid ?
+            errors.push({message: 'Favor de proporcionar la ciudad de destino'}) : req.params.category_uuid;
+
+        if (errors.length > 0) {
+            return res.status(JsonResponse.BAD_REQUEST).json({
+                ok: false,
+                errors
+            });
+        }
+
+        const category = await ProductController.categoryQueries.show({
+            uuid: categoryUuid
+        });
+
+        if (!category.ok) {
+            errors.push({message: 'Existen problema al buscar la categoria solicitada'});
+        } else if (!category.category) {
+            errors.push({message: 'La categoria no se encuentra dada de alta'});
+        }
+
+        // 1. Primero buscamos productos por categoria
+
+        let products = await ProductController.productQueries.getProductsByCategory(category.category.id);
+
+        if (!products.ok) {
+            return res.status(JsonResponse.BAD_REQUEST).json({
+                ok: false,
+                errors: [{message: 'Algo salio mal a la hora de traer los productos.'}]
+            });
+        }
+
+        /*let providers = await ProductController.providerQueries.getProviderByCity(cityId);
+
+        if (!providers.ok) {
+            return res.status(JsonResponse.BAD_REQUEST).json({
+                ok: false,
+                errors: [{message: 'Algo salio mal a la hora de traer los productos.'}]
+            });
+        }
+
+        let productsArray = []
+        for (const provider of providers.providers) {
+            let products = await ProductController.productQueries.getProductsByProvider(provider.id);
+            productsArray.push(products.products);
+        }
+
+        console.log(productsArray);*/
+
+        return res.status(JsonResponse.OK).json({
+            ok: true,
+            products: products.products,
+        })
     }
 
     public async images(req: Request, res: Response) {

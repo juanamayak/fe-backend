@@ -13,6 +13,43 @@ export class CategoryController {
     static categoriesQueries: CategoryQueries = new CategoryQueries();
     static categoriesValidator: CategoryValidator = new CategoryValidator();
 
+    public async show(req: Request, res: Response) {
+        const errors = [];
+
+        const categoryUuid = !req.params.uuid || validator.isEmpty(req.params.uuid) ?
+            errors.push({message: 'Favor de proporcionar la categoria'}) : req.params.uuid;
+
+        if (errors.length > 0) {
+            return res.status(JsonResponse.BAD_REQUEST).json({
+                ok: false,
+                errors
+            });
+        }
+
+        const category = await CategoryController.categoriesQueries.show({
+            uuid: categoryUuid
+        });
+
+
+        if (!category.ok) {
+            errors.push({message: 'Existen problemas al buscar el registro solicitado'});
+        } else if (!category.category) {
+            errors.push({message: 'El registro no se encuentra dado de alta'});
+        }
+
+        if (errors.length > 0) {
+            return res.status(JsonResponse.BAD_REQUEST).json({
+                ok: false,
+                errors
+            });
+        }
+
+        return res.status(JsonResponse.OK).json({
+            ok: true,
+            category: category.category
+        });
+    }
+
     public async index(req: Request, res: Response) {
         let categories = await CategoryController.categoriesQueries.index();
 

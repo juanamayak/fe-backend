@@ -9,7 +9,16 @@ export class CategoryQueries {
             const category = await CategoryModel.findOne({
                 where: {
                     uuid: data.uuid
-                }
+                },
+                include: [
+                    {
+                        model: SubcategoryModel,
+                        as: 'subcategories',
+                        where: {
+                            status: 1
+                        }
+                    }
+                ]
             })
             return {ok: true, category}
         } catch (e) {

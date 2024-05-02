@@ -49,6 +49,7 @@ export class Routes {
         app.route('/api/clients/verify/:uuid/:code').get(this.clientController.verify);
 
         /* RUTAS DE CATEGORIAS */
+        app.route('/api/categories/:uuid').get(this.categoryController.show);
         app.route('/api/categories').get(this.categoryController.index);
         app.route('/api/categories/create').post(CheckHeaders.validateJWTUser, this.categoryController.store);
         app.route('/api/categories/update').post(this.categoryController.update);
@@ -75,11 +76,12 @@ export class Routes {
 
         // RUTAS DE PRODUCTOS
         app.route('/api/products/:uuid').get(this.productController.show);
-        app.route('/api/products').get(this.productController.index);
+        app.route('/api/products/').get(this.productController.index);
         app.route('/api/products/create').post(CheckHeaders.validateJWTUser, this.productController.store);
         app.route('/api/products/update/:uuid').post(this.productController.update);
         app.route('/api/products/delete/:uuid').post(this.productController.delete);
         app.route('/api/products/images/:uuid').get(this.productController.images);
+        app.route('/api/products/category/:category_uuid').get(this.productController.productsByCategory);
 
         /* RUTAS DE PROVEEDORES  */
         app.route('/api/providers').get(this.providerController.index);

@@ -3,6 +3,7 @@ import {ProductModel} from "../models/product.model";
 import {SubcategoryModel} from "../models/subcategory.model";
 import {ProviderModel} from "../models/provider.model";
 import {ImageModel} from "../models/image.model";
+import {ProductProviderModel} from "../models/product_provider.model";
 
 export class ProductQueries {
 
@@ -13,8 +14,8 @@ export class ProductQueries {
                     uuid: data.uuid
                 },
                 include: [
-                    { model: SubcategoryModel, as: 'subcategories'},
-                    { model: ProviderModel, as: 'providers'}
+                    {model: SubcategoryModel, as: 'subcategories'},
+                    {model: ProviderModel, as: 'providers'}
                 ]
             })
 
@@ -69,6 +70,37 @@ export class ProductQueries {
                     }
                 })
             return {ok: true}
+        } catch (e) {
+            console.log(e)
+            return {ok: false}
+        }
+    }
+
+    public async getProductsByCategory(categoryId) {
+        try {
+            let products = await ProductModel.findAll(
+                {
+                    where: {
+                        category_id: categoryId
+                    },
+                    include: [
+                        {
+                            model: ProviderModel,
+                            as: 'providers',
+                            attributes: ['country_id', 'state_id', 'city_id', 'name']
+                        },
+                        {
+                            model: SubcategoryModel,
+                            as: 'subcategories',
+                            where: {
+                                status: 1
+                            },
+                            attributes: ['id', 'name', 'status']
+                        }
+                    ],
+                    attributes: ['sku', 'name', 'description', 'price', 'discount_percent', 'status']
+                })
+            return {ok: true, products}
         } catch (e) {
             console.log(e)
             return {ok: false}
