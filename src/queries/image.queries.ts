@@ -4,20 +4,6 @@ import {ImageModel} from "../models/image.model";
 
 export class ImageQueries {
 
-    public async show(data: any) {
-        try {
-            const address = await AddressModel.findOne({
-                where: {
-                    uuid: data.uuid
-                }
-            })
-            return {ok: true, address}
-        } catch (e) {
-            console.log(e)
-            return {ok: false}
-        }
-    }
-
     public async index() {
         try {
             let images = await AddressModel.findAll()
@@ -61,6 +47,20 @@ export class ImageQueries {
                 }
             })
             return {ok: true}
+        } catch (e) {
+            console.log(e)
+            return {ok: false}
+        }
+    }
+
+    public async productImage(data: any) {
+        try {
+            const image = await ImageModel.findOne({
+                where: {
+                    imageable_id: data.imageable_id
+                }
+            })
+            return {ok: true, image}
         } catch (e) {
             console.log(e)
             return {ok: false}

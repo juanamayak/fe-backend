@@ -417,7 +417,6 @@ export class ProductController {
         }
 
         // 1. Primero buscamos productos por categoria
-
         let products = await ProductController.productQueries.getProductsByCategory(category.category.id);
 
         if (!products.ok) {
@@ -427,27 +426,52 @@ export class ProductController {
             });
         }
 
-        /*let providers = await ProductController.providerQueries.getProviderByCity(cityId);
+        // 2. Obtenemos las imagenes de cada producto
+        let tempProductsData: any;
+        let productsWithImages = [];
+        for (const product of products.products) {
+            const image = await ProductController.imageQueries.productImage({
+                imageable_id: product.id
+            })
 
-        if (!providers.ok) {
-            return res.status(JsonResponse.BAD_REQUEST).json({
-                ok: false,
-                errors: [{message: 'Algo salio mal a la hora de traer los productos.'}]
-            });
+            if (!image.ok) {
+                return res.status(JsonResponse.BAD_REQUEST).json({
+                    ok: false,
+                    errors: [{message: "Existen problemas al momento de obtener los archivos de evidencia del operador."}]
+                })
+            }
+
+            let downloadedImages: any;
+            if (image.image) {
+                downloadedImages = await ProductController.downloadImages(image.image);
+
+                if (!downloadedImages.ok) {
+                    return res.status(JsonResponse.BAD_REQUEST).json({
+                        ok: false,
+                        errors: downloadedImages.errors
+                    })
+                }
+            }
+
+            tempProductsData = {
+                id: product.id,
+                uuid: product.uuid,
+                sku: product.sku,
+                name: product.name,
+                description: product.description,
+                price: product.price,
+                discount_percent: product.discount_percent,
+                status: product.status,
+                image: downloadedImages.image
+            }
+
+            productsWithImages.push(tempProductsData);
         }
-
-        let productsArray = []
-        for (const provider of providers.providers) {
-            let products = await ProductController.productQueries.getProductsByProvider(provider.id);
-            productsArray.push(products.products);
-        }
-
-        console.log(productsArray);*/
 
         return res.status(JsonResponse.OK).json({
             ok: true,
-            products: products.products,
-        })
+            products: productsWithImages
+        });
     }
 
     public async images(req: Request, res: Response) {
@@ -573,9 +597,22 @@ export class ProductController {
     private static async downloadImages(images: any) {
         try {
             const base64Images = []
-            for (const image of images) {
-                const downloadedImage = await ProductController.file.download(image, 'product')
+            if(Array.isArray(images)) {
+                for (const image of images) {
+                    const downloadedImage = await ProductController.file.download(image, 'product')
 
+                    if (!downloadedImage.ok) {
+                        return {
+                            ok: false,
+                            errors: [{message: "Existen problemas al momento de obtener el archivo."}]
+                        }
+                    }
+
+                    base64Images.push(downloadedImage.image)
+                }
+                return {ok: true, base64Images}
+            } else {
+                const downloadedImage = await ProductController.file.download(images, 'product')
                 if (!downloadedImage.ok) {
                     return {
                         ok: false,
@@ -583,10 +620,8 @@ export class ProductController {
                     }
                 }
 
-                base64Images.push(downloadedImage.image)
-
+                return {ok: true, image: downloadedImage.image}
             }
-            return {ok: true, base64Images}
         } catch (e) {
             console.log(e)
             return {

@@ -81,7 +81,8 @@ export class ProductQueries {
             let products = await ProductModel.findAll(
                 {
                     where: {
-                        category_id: categoryId
+                        category_id: categoryId,
+                        status: 1
                     },
                     include: [
                         {
@@ -98,8 +99,8 @@ export class ProductQueries {
                             attributes: ['id', 'name', 'status']
                         }
                     ],
-                    attributes: ['sku', 'name', 'description', 'price', 'discount_percent', 'status']
-                })
+                    attributes: ['id', 'uuid', 'sku', 'name', 'description', 'price', 'discount_percent', 'status']
+                });
             return {ok: true, products}
         } catch (e) {
             console.log(e)
