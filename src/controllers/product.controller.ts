@@ -462,7 +462,9 @@ export class ProductController {
                 price: product.price,
                 discount_percent: product.discount_percent,
                 status: product.status,
-                image: downloadedImages.image
+                image: downloadedImages.image,
+                providers: product['providers'],
+                subcategories: product['subcategories']
             }
 
             productsWithImages.push(tempProductsData);
