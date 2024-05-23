@@ -4,6 +4,7 @@ import {SubcategoryModel} from "../models/subcategory.model";
 import {ProviderModel} from "../models/provider.model";
 import {ImageModel} from "../models/image.model";
 import {ProductProviderModel} from "../models/product_provider.model";
+import {CategoryModel} from "../models/category.model";
 
 export class ProductQueries {
 
@@ -14,6 +15,7 @@ export class ProductQueries {
                     uuid: data.uuid
                 },
                 include: [
+                    {model: CategoryModel, as: 'category'},
                     {model: SubcategoryModel, as: 'subcategories'},
                     {model: ProviderModel, as: 'providers'}
                 ]

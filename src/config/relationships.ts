@@ -55,6 +55,8 @@ export default class Relationship {
             as: 'images'
         });
 
+        ProductModel.belongsTo(CategoryModel, {foreignKey: 'category_id', as: 'category'})
+
         CountryModel.hasMany(AddressModel, {foreignKey: 'country_id', as: 'addresses'});
         StateModel.hasMany(AddressModel, {foreignKey: 'state_id', as: 'addresses'});
         CityModel.hasMany(AddressModel, {foreignKey: 'city_id', as: 'addresses'});
@@ -66,6 +68,7 @@ export default class Relationship {
 
         /* Relaciones de Categorias */
         CategoryModel.hasMany(SubcategoryModel, {foreignKey: 'category_id', as: 'subcategories'});
+        // CategoryModel.belongsTo(ProductModel, {foreignKey: 'category_id', as: 'category'});
 
         /* Relaciones de Clients */
         ClientModel.hasMany(CartModel, {foreignKey: 'client_id'});

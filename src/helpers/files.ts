@@ -68,6 +68,7 @@ export class File {
                 ok: true,
                 image: {
                     file: {
+                        id: image.id,
                         name: image.name,
                         type: image.media_type,
                     },
