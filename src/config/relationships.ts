@@ -19,6 +19,7 @@ import {SubcategoryModel} from "../models/subcategory.model";
 import {ProviderModel} from "../models/provider.model";
 import {ImageModel} from "../models/image.model";
 import {ProductProviderModel} from "../models/product_provider.model";
+import {CartProductModel} from "../models/cart_product.model";
 
 export default class Relationship {
     static init() {
@@ -89,8 +90,9 @@ export default class Relationship {
         CouponModel.belongsToMany(ClientModel, {through: 'ClientOrderCouponModel', foreignKey: 'coupon_id'});
 
         /* Relaciones de Carts */
-        CartModel.belongsToMany(ProductModel, {through: 'CartProduct', foreignKey: 'cart_id'});
-        ProductModel.belongsToMany(CartModel, {through: 'CartProduct', foreignKey: 'product_id'});
+        // CartModel.hasMany(ProductModel, {foreignKey: 'cart_id'});
+        ProductModel.belongsToMany(CartModel, { through: CartProductModel, foreignKey: 'product_id', as: 'product' });
+        CartModel.belongsToMany(ProductModel, { through: CartProductModel, foreignKey: 'cart_id', as: 'product' });
 
 
     }

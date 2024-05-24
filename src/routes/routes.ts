@@ -15,6 +15,7 @@ import {LocationsController} from "../controllers/locations.controller";
 import {MessageController} from "../controllers/message.controller";
 import {RolesController} from "../controllers/roles.controller";
 import {PermissionsController} from "../controllers/permissions.controller";
+import {CartController} from "../controllers/cart.controller";
 
 export class Routes {
     public addressController: AddressController = new AddressController()
@@ -25,6 +26,7 @@ export class Routes {
     public providerController: ProviderController = new ProviderController()
     public subcategoryController: SubcategoryController = new SubcategoryController()
     public clientController: ClientController = new ClientController()
+    public cartController: CartController = new CartController()
     public usersController: UsersController = new UsersController()
     public locationsController: LocationsController = new LocationsController()
     public messagesController: MessageController = new MessageController()
@@ -104,6 +106,8 @@ export class Routes {
         // RUTAS DE COSTOS DE ENVÍO
 
         // RUTAS DE CARRITO DE COMPRAS
+        app.route('/api/cart').get(CheckHeaders.validateJWTClient, this.cartController.index);
+        app.route('/api/cart/create').post(CheckHeaders.validateJWTClient, this.cartController.store);
 
         // RUTAS DE ORDENES
 
