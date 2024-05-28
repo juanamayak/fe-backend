@@ -90,10 +90,7 @@ export default class Relationship {
         CouponModel.belongsToMany(ClientModel, {through: 'ClientOrderCouponModel', foreignKey: 'coupon_id'});
 
         /* Relaciones de Carts */
-        // CartModel.hasMany(ProductModel, {foreignKey: 'cart_id'});
-        ProductModel.belongsToMany(CartModel, { through: CartProductModel, foreignKey: 'product_id', as: 'product' });
-        CartModel.belongsToMany(ProductModel, { through: CartProductModel, foreignKey: 'cart_id', as: 'product' });
-
+        CartModel.belongsTo(ProductModel, { foreignKey: 'product_id', as: 'product' });
 
     }
 }

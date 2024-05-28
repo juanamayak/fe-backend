@@ -87,46 +87,64 @@ export class CartController {
             });
         }
 
-        const cartExists = await CartController.cartQueries.findIfExists(body);
+        const cart = await CartController.cartQueries.getActiveClientCart(client_id);
 
-        if (cartExists.ok) {
-            errors.push({message: 'El producto ya se encuentra en el carrito de compras'});
-        }
+        if (cart.cart) { // Si hay un carrito activo, verificamos si el producto ya esta agregado
 
-        if (errors.length > 0) {
-            return res.status(JsonResponse.BAD_REQUEST).json({
-                ok: false,
-                errors
-            });
-        }
+            const cartProduct = await CartController.cartProductQueries.show(cart.cart.id, body.product_id);
 
-        const data = {
-            client_id,
-            status: 1
-        }
+            if (!cartProduct.ok) {
+                return res.status(JsonResponse.BAD_REQUEST).json({
+                    ok: false,
+                    errors: [{message: "Existen problemas al momento de obtener los productos."}]
+                });
+            }
 
-        const cartCreated = await CartController.cartQueries.create(data);
+            const data = {
+                quantity: (cartProduct.data.quantity + body.quantity)
+            }
 
-        if (!cartCreated.ok) {
-            return res.status(JsonResponse.BAD_REQUEST).json({
-                ok: false,
-                errors: [{message: "Existen problemas al momento de cear el carrito de compras. Intente más tarde."}]
-            });
-        }
+            const updatedQuantity = await CartController.cartProductQueries.update(cartProduct.data.id, data);
 
-        const cartProductData = {
-            cart_id: cartCreated.cart.id,
-            product_id: body.product_id,
-            quantity: body.quantity,
-        }
+            if (!updatedQuantity.data) {
+                errors.push({message: 'Se encontro un problema a la hora de actualizar el carrito de compras. Intente de nuevamente'});
+            }
 
-        const cartProductCreated = await CartController.cartProductQueries.create(cartProductData);
+            if (errors.length > 0) {
+                return res.status(JsonResponse.BAD_REQUEST).json({
+                    ok: false,
+                    errors
+                });
+            }
+        } else { // Si no hay un carrito activo, se crea y de añaden los productos
+            const data = {
+                client_id,
+                status: 1
+            }
 
-        if (!cartProductCreated.ok) {
-            return res.status(JsonResponse.BAD_REQUEST).json({
-                ok: false,
-                errors: [{message: "Existen problemas al momento de cear el carrito de compras. Intente más tarde."}]
-            });
+            const cartCreated = await CartController.cartQueries.create(data);
+
+            if (!cartCreated.ok) {
+                return res.status(JsonResponse.BAD_REQUEST).json({
+                    ok: false,
+                    errors: [{message: "Existen problemas al momento de cear el carrito de compras. Intente más tarde."}]
+                });
+            }
+
+            const cartProductData = {
+                cart_id: cartCreated.data.id,
+                product_id: body.product_id,
+                quantity: body.quantity,
+            }
+
+            const cartProductCreated = await CartController.cartProductQueries.create(cartProductData);
+
+            if (!cartProductCreated.ok) {
+                return res.status(JsonResponse.BAD_REQUEST).json({
+                    ok: false,
+                    errors: [{message: "Existen problemas al momento de cear el carrito de compras. Intente más tarde."}]
+                });
+            }
         }
 
         return res.status(JsonResponse.OK).json({
@@ -135,53 +153,17 @@ export class CartController {
         });
     }
 
-    /*public async update(req: Request, res: Response) {
+    /*public async updateQuantity(req: Request, res: Response) {
         const body = req.body;
-        console.log(body);
+        const client_id = req.body.client_id;
         const errors = [];
 
-        const clientUuid = !req.params.uuid || validator.isEmpty(req.params.uuid) ?
-            errors.push({message: 'Favor de proporcionar el usuario'}) : req.params.uuid;
+        const updatedQuantity = await CartController.cartQueries.update(cart.cart.id, data);
 
-        if (errors.length > 0) {
-            return res.status(JsonResponse.BAD_REQUEST).json({
-                ok: false,
-                errors
-            });
+        if (!updatedQuantity.cart) {
+            errors.push({message: 'Se encontro un problema a la hora de actualizar el carrito de compras. Intente de nuevamente'});
         }
 
-        // Validacion del request
-        const validatedData = await ClientController.clientValidator.validateUpdate(body);
-
-        if (!validatedData.ok) {
-            return res.status(JsonResponse.BAD_REQUEST).json({
-                ok: false,
-                errors: validatedData.errors
-            });
-        }
-
-        const client = await ClientController.clientQueries.show({
-            uuid: clientUuid
-        });
-
-        if (!client.ok) {
-            errors.push({message: 'Existen problemas al buscar el registro solicitado'});
-        } else if (!client.client) {
-            errors.push({message: 'El registro no se encuentra dado de alta'});
-        }
-
-        if (errors.length > 0) {
-            return res.status(JsonResponse.BAD_REQUEST).json({
-                ok: false,
-                errors
-            });
-        }
-
-        const updatedClient = await ClientController.clientQueries.update(client.client.id, body);
-
-        if (!updatedClient.client) {
-            errors.push({message: 'Existen problemas al momento de actualizar el registro. Intente de nuevamente'});
-        }
         if (errors.length > 0) {
             return res.status(JsonResponse.BAD_REQUEST).json({
                 ok: false,
@@ -193,7 +175,9 @@ export class CartController {
             ok: true,
             message: 'Tu información se actualizo correctamente'
         });
-    }
+    }*/
+
+    /*
 
     public async addressUpdate(req: Request, res: Response) {
         const body = req.body;

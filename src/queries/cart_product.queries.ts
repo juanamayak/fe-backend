@@ -9,15 +9,15 @@ import {CartProductModel} from "../models/cart_product.model";
 
 export class CartProductQueries {
 
-    public async show(data: any) {
+    public async show(cartId: any, productId: any) {
         try {
-            const client = await ClientModel.findOne({
+            const data = await CartProductModel.findOne({
                 where: {
-                    uuid: data.uuid
-                },
-                attributes: ['id', 'name', 'lastname', 'email', 'birthday', 'cellphone', 'verification_code', 'country_id', 'state_id', 'city_id', 'address', 'zip']
+                    cart_id: cartId,
+                    product_id: productId
+                }
             })
-            return {ok: true, client}
+            return {ok: true, data}
         } catch (e) {
             console.log(e)
             return {ok: false}
@@ -47,25 +47,25 @@ export class CartProductQueries {
         }
     }
 
-    public async create(data) {
+    public async create(body) {
         try {
-            let cart = await CartProductModel.create(data);
-            return {ok: true, cart}
+            let data = await CartProductModel.create(body);
+            return {ok: true, data}
         } catch (e) {
             console.log(e)
             return {ok: false}
         }
     }
 
-    public async update(clientId: any, data: any) {
+    public async update(cartProductId: any, body: any) {
         try {
-            let client = await ClientModel.update(
-                data, {
+            let data = await CartProductModel.update(
+                body, {
                     where: {
-                        id: clientId,
+                        id: cartProductId,
                     }
                 })
-            return {ok: true, client}
+            return {ok: true, data}
         } catch (e) {
             console.log(e)
             return {ok: false}

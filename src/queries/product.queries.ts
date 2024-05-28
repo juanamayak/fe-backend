@@ -5,6 +5,7 @@ import {ProviderModel} from "../models/provider.model";
 import {ImageModel} from "../models/image.model";
 import {ProductProviderModel} from "../models/product_provider.model";
 import {CategoryModel} from "../models/category.model";
+import {CartModel} from "../models/cart.model";
 
 export class ProductQueries {
 

@@ -47,25 +47,25 @@ export class CartQueries {
         }
     }
 
-    public async create(data) {
+    public async create(body) {
         try {
-            let cart = await CartModel.create(data);
-            return {ok: true, cart}
+            let data = await CartModel.create(body);
+            return {ok: true, data}
         } catch (e) {
             console.log(e)
             return {ok: false}
         }
     }
 
-    public async update(clientId: any, data: any) {
+    public async update(cartId: any, data: any) {
         try {
-            let client = await ClientModel.update(
+            let cart = await CartModel.update(
                 data, {
                     where: {
-                        id: clientId,
+                        id: cartId,
                     }
                 })
-            return {ok: true, client}
+            return {ok: true, cart}
         } catch (e) {
             console.log(e)
             return {ok: false}
@@ -87,12 +87,12 @@ export class CartQueries {
         }
     }
 
-    public async findIfExists(cartData) {
+    public async getActiveClientCart(clientId: any) {
         try {
             const cart = await CartModel.findOne({
                 where: {
-                    product_id: cartData.product_id,
-                    status: 1
+                    client_id: clientId,
+                    status: 1 // 1 = activo, 0 = inactivo
                 }
             });
             return {ok: true, cart}

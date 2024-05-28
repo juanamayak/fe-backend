@@ -133,11 +133,12 @@ export class ProductController {
 
             let productSubcategories = subcategories.map(subcategoryId => ({
                 product_id: createdProduct.product.id,
-                provider_id: subcategoryId
+                subcategory_id: subcategoryId
             }));
 
             await ProductController.productSubcategoryQueries.create(productSubcategories, {transaction});
         } catch (e) {
+            console.log(e);
             await transaction.rollback();
             errors.push({message: 'Se encontro un error a la hora de crear los proveedores y/o subcategorias'});
         }
