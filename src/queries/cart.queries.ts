@@ -8,24 +8,9 @@ import {ProductModel} from "../models/product.model";
 
 export class CartQueries {
 
-    public async show(data: any) {
+    public async show(clientId: any) {
         try {
-            const client = await ClientModel.findOne({
-                where: {
-                    uuid: data.uuid
-                },
-                attributes: ['id', 'name', 'lastname', 'email', 'birthday', 'cellphone', 'verification_code', 'country_id', 'state_id', 'city_id', 'address', 'zip']
-            })
-            return {ok: true, client}
-        } catch (e) {
-            console.log(e)
-            return {ok: false}
-        }
-    }
-
-    public async index(clientId: any) {
-        try {
-            let cart = await CartModel.findAll({
+            let data = await CartModel.findOne({
                 where: {
                     client_id: clientId,
                     status: 1
@@ -33,14 +18,17 @@ export class CartQueries {
                 include: [
                     {
                         model: ProductModel,
-                        as: 'product',
+                        as: 'products',
+                        through: {
+                            attributes: ['quantity']
+                        },
                         where: {
                             status: 1
                         }
                     }
                 ]
             })
-            return {ok: true, cart}
+            return {ok: true, data}
         } catch (e) {
             console.log(e)
             return {ok: false}
@@ -89,13 +77,13 @@ export class CartQueries {
 
     public async getActiveClientCart(clientId: any) {
         try {
-            const cart = await CartModel.findOne({
+            const data = await CartModel.findOne({
                 where: {
                     client_id: clientId,
                     status: 1 // 1 = activo, 0 = inactivo
                 }
             });
-            return {ok: true, cart}
+            return {ok: true, data}
         } catch (e) {
             console.log(e)
             return {ok: false}

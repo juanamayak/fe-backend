@@ -20,8 +20,8 @@ export class DeliveryHourQueries {
 
     public async index() {
         try {
-            let hours = await DeliveryHourModel.findAll({order: [["createdAt", "ASC"]]})
-            return {ok: true, hours}
+            let data = await DeliveryHourModel.findAll({order: [["createdAt", "ASC"]]})
+            return {ok: true, data}
         } catch (e) {
             console.log(e)
             return {ok: false}

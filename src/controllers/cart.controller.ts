@@ -54,10 +54,10 @@ export class CartController {
 
     */
 
-    public async index(req: Request, res: Response) {
+    public async show(req: Request, res: Response) {
         const client_id = req.body.client_id;
 
-        let cart = await CartController.cartQueries.index(client_id)
+        let cart = await CartController.cartQueries.show(client_id)
 
         if (!cart.ok) {
             return res.status(JsonResponse.BAD_REQUEST).json({
@@ -66,9 +66,32 @@ export class CartController {
             });
         }
 
+        const simplifiedCart = {
+            id: cart.data.id,
+            client_id: cart.data.client_id,
+            status: cart.data.status,
+            createdAt: cart.data.createdAt,
+            updatedAt: cart.data.updatedAt,
+            products: cart.data['products'].map(product => ({
+                id: product.id,
+                user_id: product.user_id,
+                category_id: product.category_id,
+                uuid: product.uuid,
+                name: product.name,
+                price: product.price,
+                sku: product.sku,
+                discount_percent: product.discount_percent,
+                description: product.description,
+                status: product.status,
+                createdAt: product.createdAt,
+                updatedAt: product.updatedAt,
+                quantity: product.CartProductModel.quantity // Aquí simplificamos el quantity
+            }))
+        };
+
         return res.status(JsonResponse.OK).json({
             ok: true,
-            cart: cart.cart,
+            cart: simplifiedCart,
         })
     }
 
@@ -89,32 +112,40 @@ export class CartController {
 
         const cart = await CartController.cartQueries.getActiveClientCart(client_id);
 
-        if (cart.cart) { // Si hay un carrito activo, verificamos si el producto ya esta agregado
+        if (cart.data) { // Si hay un carrito activo, verificamos si el producto ya esta agregado
+            const cartProduct = await CartController.cartProductQueries.show(cart.data.id, body.product_id);
+            if (!cartProduct.data) { // Si no existe el producto, lo agregamos
+                const cartProductData = {
+                    cart_id: cart.data.id,
+                    product_id: body.product_id,
+                    quantity: body.quantity,
+                }
 
-            const cartProduct = await CartController.cartProductQueries.show(cart.cart.id, body.product_id);
+                const cartProductCreated = await CartController.cartProductQueries.create(cartProductData);
 
-            if (!cartProduct.ok) {
-                return res.status(JsonResponse.BAD_REQUEST).json({
-                    ok: false,
-                    errors: [{message: "Existen problemas al momento de obtener los productos."}]
-                });
-            }
+                if (!cartProductCreated.ok) {
+                    return res.status(JsonResponse.BAD_REQUEST).json({
+                        ok: false,
+                        errors: [{message: "Existen problemas al momento de cear el carrito de compras. Intente más tarde."}]
+                    });
+                }
+            } else {
+                const data = {
+                    quantity: (cartProduct.data.quantity + body.quantity)
+                }
 
-            const data = {
-                quantity: (cartProduct.data.quantity + body.quantity)
-            }
+                const updatedQuantity = await CartController.cartProductQueries.update(cartProduct.data.id, data);
 
-            const updatedQuantity = await CartController.cartProductQueries.update(cartProduct.data.id, data);
+                if (!updatedQuantity.data) {
+                    errors.push({message: 'Se encontro un problema a la hora de actualizar el carrito de compras. Intente de nuevamente'});
+                }
 
-            if (!updatedQuantity.data) {
-                errors.push({message: 'Se encontro un problema a la hora de actualizar el carrito de compras. Intente de nuevamente'});
-            }
-
-            if (errors.length > 0) {
-                return res.status(JsonResponse.BAD_REQUEST).json({
-                    ok: false,
-                    errors
-                });
+                if (errors.length > 0) {
+                    return res.status(JsonResponse.BAD_REQUEST).json({
+                        ok: false,
+                        errors
+                    });
+                }
             }
         } else { // Si no hay un carrito activo, se crea y de añaden los productos
             const data = {
@@ -153,14 +184,24 @@ export class CartController {
         });
     }
 
-    /*public async updateQuantity(req: Request, res: Response) {
+    public async quantity(req: Request, res: Response) {
         const body = req.body;
         const client_id = req.body.client_id;
         const errors = [];
 
-        const updatedQuantity = await CartController.cartQueries.update(cart.cart.id, data);
+        const productId = !req.params.productId ?
+            errors.push({message: 'Favor de proporcionar el producto'}) : req.params.productId;
 
-        if (!updatedQuantity.cart) {
+        if (errors.length > 0) {
+            return res.status(JsonResponse.BAD_REQUEST).json({
+                ok: false,
+                errors
+            });
+        }
+
+        const updatedQuantity = await CartController.cartProductQueries.quantity(productId, body);
+
+        if (!updatedQuantity.data) {
             errors.push({message: 'Se encontro un problema a la hora de actualizar el carrito de compras. Intente de nuevamente'});
         }
 
@@ -175,7 +216,7 @@ export class CartController {
             ok: true,
             message: 'Tu información se actualizo correctamente'
         });
-    }*/
+    }
 
     /*
 

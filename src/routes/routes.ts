@@ -16,6 +16,7 @@ import {MessageController} from "../controllers/message.controller";
 import {RolesController} from "../controllers/roles.controller";
 import {PermissionsController} from "../controllers/permissions.controller";
 import {CartController} from "../controllers/cart.controller";
+import {DeliveryHourController} from "../controllers/delivery_hour.controller";
 
 export class Routes {
     public addressController: AddressController = new AddressController()
@@ -31,6 +32,7 @@ export class Routes {
     public locationsController: LocationsController = new LocationsController()
     public messagesController: MessageController = new MessageController()
     public permissionsController: PermissionsController = new PermissionsController()
+    public deliveryHoursController: DeliveryHourController = new DeliveryHourController()
 
     public routes(app: express.Application): void {
         // RUTAS DE USUARIOS
@@ -106,11 +108,14 @@ export class Routes {
         // RUTAS DE COSTOS DE ENVÍO
 
         // RUTAS DE CARRITO DE COMPRAS
-        app.route('/api/cart').get(CheckHeaders.validateJWTClient, this.cartController.index);
+        app.route('/api/cart').get(CheckHeaders.validateJWTClient, this.cartController.show);
         app.route('/api/cart/create').post(CheckHeaders.validateJWTClient, this.cartController.store);
-        // app.route('/api/cart/updateQuantity').put(CheckHeaders.validateJWTClient, this.cartController.updateQuantity);
+        app.route('/api/cart/quantity/:productId').put(CheckHeaders.validateJWTClient, this.cartController.quantity);
 
         // RUTAS DE ORDENES
+
+        // RUTAS DE HORARIOS
+        app.route('/api/hours').get(this.deliveryHoursController.index);
 
         // RUTAS DE ROLES AND PERMISSIONS
         app.route('/api/roles').get(this.rolesController.index);

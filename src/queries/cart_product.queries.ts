@@ -87,6 +87,21 @@ export class CartProductQueries {
         }
     }
 
+    public async quantity(productId: any, body: any) {
+        try {
+            let data = await CartProductModel.update(
+                body, {
+                    where: {
+                        product_id: productId,
+                    }
+                })
+            return {ok: true, data}
+        } catch (e) {
+            console.log(e)
+            return {ok: false}
+        }
+    }
+
     public async findIfExists(cartData) {
         try {
             const cart = await CartModel.findOne({

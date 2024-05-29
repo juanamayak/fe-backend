@@ -4,6 +4,7 @@ import {DeliveryHourQueries} from "../queries/delivery_hour.queries";
 import {DeliveryHourValidator} from "../validators/delivery_hour.validator";
 import {v4 as uuidv4} from 'uuid';
 import validator from "validator";
+import moment from 'moment';
 
 export class DeliveryHourController {
     static deliveryHourQueries: DeliveryHourQueries = new DeliveryHourQueries();
@@ -19,9 +20,29 @@ export class DeliveryHourController {
             });
         }
 
+        const formattedHours = deliveryHours.data.map((hour: any) => {
+            // Formatear las horas de inicio y fin
+            const formattedStartHour = moment(new Date(`1970-01-01T${hour.start_hour}Z`), 'HH:mm:ss');
+            const formattedEndHour = moment(new Date(`1970-01-01T${hour.end_hour}Z`), 'HH:mm:ss');
+
+            console.log(formattedStartHour);
+
+            return {
+                id: hour.id,
+                user_id: hour.user_id,
+                uuid: hour.uuid,
+                start_hour: formattedStartHour,
+                end_hour: formattedEndHour,
+                special: hour.special,
+                status: hour.status,
+                createdAt: hour.createdAt,
+                updatedAt: hour.updatedAt,
+            };
+        });
+
         return res.status(JsonResponse.OK).json({
             ok: true,
-            hours: deliveryHours.hours,
+            hours: formattedHours,
         });
     }
 
