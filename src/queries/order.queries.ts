@@ -7,14 +7,14 @@ import {OrderModel} from "../models/order.model";
 
 export class OrderQueries {
 
-    public async show(data: any) {
+    public async show(body: any) {
         try {
-            const address = await AddressModel.findOne({
+            const data = await OrderModel.findOne({
                 where: {
-                    uuid: data.uuid
+                    uuid: body.uuid
                 }
             })
-            return {ok: true, address}
+            return {ok: true, data}
         } catch (e) {
             console.log(e)
             return {ok: false}

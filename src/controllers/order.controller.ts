@@ -7,13 +7,48 @@ import {OrderValidator} from "../validators/order.validator";
 import {OrderQueries} from "../queries/order.queries";
 import moment from "moment";
 import {OrderProductQueries} from "../queries/order_product.queries";
-import {DECIMAL} from "sequelize";
 
 export class OrderController {
 
     static ordersQueries: OrderQueries = new OrderQueries();
     static ordersProductQueries: OrderProductQueries = new OrderProductQueries();
     static ordersValidator: OrderValidator = new OrderValidator();
+
+    public async show(req: Request, res: Response) {
+        const errors = [];
+
+        const orderUuid = !req.params.uuid || validator.isEmpty(req.params.uuid) ?
+            errors.push({message: 'Favor de proporcionar el producto'}) : req.params.uuid;
+
+        if (errors.length > 0) {
+            return res.status(JsonResponse.BAD_REQUEST).json({
+                ok: false,
+                errors
+            });
+        }
+
+        const order = await OrderController.ordersQueries.show({
+            uuid: orderUuid
+        });
+
+        if (!order.ok) {
+            errors.push({message: 'Existen problemas al buscar el registro solicitado'});
+        } else if (!order.data) {
+            errors.push({message: 'El registro no se encuentra dado de alta'});
+        }
+
+        if (errors.length > 0) {
+            return res.status(JsonResponse.BAD_REQUEST).json({
+                ok: false,
+                errors
+            });
+        }
+
+        return res.status(JsonResponse.OK).json({
+            ok: true,
+            order: order.data
+        });
+    }
 
     /*public async index(req: Request, res: Response) {
         let addresses = await OrderController.addressesQueries.index()
@@ -90,7 +125,7 @@ export class OrderController {
         return res.status(JsonResponse.OK).json({
             ok: true,
             message: 'La orden se creo exitosamente',
-            order: orderCreated.data
+            order: orderCreated.data.uuid
         });
     }
 
