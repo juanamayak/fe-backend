@@ -6,6 +6,7 @@ export class OrderProductModel extends Model {
     public order_id: number;
     public product_id: number;
     public order_number: string;
+    public quantity: number;
     public price: string;
     public createdAt: string;
     public updatedAt: string;
@@ -25,6 +26,9 @@ OrderProductModel.init({
     },
     order_number: {
         type: DataTypes.STRING
+    },
+    quantity: {
+        type: DataTypes.INTEGER
     },
     price: {
         type: DataTypes.DECIMAL

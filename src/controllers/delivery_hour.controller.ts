@@ -25,8 +25,6 @@ export class DeliveryHourController {
             const formattedStartHour = moment(new Date(`1970-01-01T${hour.start_hour}Z`), 'HH:mm:ss');
             const formattedEndHour = moment(new Date(`1970-01-01T${hour.end_hour}Z`), 'HH:mm:ss');
 
-            console.log(formattedStartHour);
-
             return {
                 id: hour.id,
                 user_id: hour.user_id,

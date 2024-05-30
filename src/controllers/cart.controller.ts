@@ -6,14 +6,16 @@ import {Mailer} from "../helpers/mailer";
 import {CartValidator} from "../validators/cart.validator";
 import {CartQueries} from "../queries/cart.queries";
 import {CartProductQueries} from "../queries/cart_product.queries";
+import {ImageQueries} from "../queries/image.queries";
+import {File} from "../helpers/files";
 
 export class CartController {
-    static salt = bcrypt.genSaltSync(Number(process.env.NO_SALT));
+
+    static file: File = new File();
     static cartQueries: CartQueries = new CartQueries();
     static cartProductQueries: CartProductQueries = new CartProductQueries();
     static cartValidator: CartValidator = new CartValidator();
-    static payload: Payload = new Payload();
-    static mailer: Mailer = new Mailer();
+    static imageQueries: ImageQueries = new ImageQueries();
 
     /*public async show(req: Request, res: Response) {
         const errors = [];
@@ -66,13 +68,34 @@ export class CartController {
             });
         }
 
-        const simplifiedCart = {
-            id: cart.data.id,
-            client_id: cart.data.client_id,
-            status: cart.data.status,
-            createdAt: cart.data.createdAt,
-            updatedAt: cart.data.updatedAt,
-            products: cart.data['products'].map(product => ({
+        // 2. Obtenemos las imagenes de cada producto
+        let tempProductsData: any;
+        let productsWithImages = [];
+        for (const product of cart.data['products']) {
+            const image = await CartController.imageQueries.productImage({
+                imageable_id: product.id
+            })
+
+            if (!image.ok) {
+                return res.status(JsonResponse.BAD_REQUEST).json({
+                    ok: false,
+                    errors: [{message: "Existen problemas al momento de obtener los archivos de evidencia del operador."}]
+                })
+            }
+
+            let downloadedImages: any;
+            if (image.image) {
+                downloadedImages = await CartController.downloadImages(image.image);
+
+                if (!downloadedImages.ok) {
+                    return res.status(JsonResponse.BAD_REQUEST).json({
+                        ok: false,
+                        errors: downloadedImages.errors
+                    })
+                }
+            }
+
+            tempProductsData = {
                 id: product.id,
                 user_id: product.user_id,
                 category_id: product.category_id,
@@ -82,11 +105,23 @@ export class CartController {
                 sku: product.sku,
                 discount_percent: product.discount_percent,
                 description: product.description,
+                image: downloadedImages.image,
                 status: product.status,
                 createdAt: product.createdAt,
                 updatedAt: product.updatedAt,
-                quantity: product.CartProductModel.quantity // Aquí simplificamos el quantity
-            }))
+                quantity: product.CartProductModel.quantity
+            }
+
+            productsWithImages.push(tempProductsData);
+        }
+
+        const simplifiedCart = {
+            id: cart.data.id,
+            client_id: cart.data.client_id,
+            status: cart.data.status,
+            createdAt: cart.data.createdAt,
+            updatedAt: cart.data.updatedAt,
+            products: productsWithImages
         };
 
         return res.status(JsonResponse.OK).json({
@@ -408,5 +443,42 @@ export class CartController {
         });
     }
 }*/
+
+    private static async downloadImages(images: any) {
+        try {
+            const base64Images = []
+            if(Array.isArray(images)) {
+                for (const image of images) {
+                    const downloadedImage = await CartController.file.download(image, 'product')
+
+                    if (!downloadedImage.ok) {
+                        return {
+                            ok: false,
+                            errors: [{message: "Existen problemas al momento de obtener el archivo."}]
+                        }
+                    }
+
+                    base64Images.push(downloadedImage.image)
+                }
+                return {ok: true, base64Images}
+            } else {
+                const downloadedImage = await CartController.file.download(images, 'product')
+                if (!downloadedImage.ok) {
+                    return {
+                        ok: false,
+                        errors: [{message: "Existen problemas al momento de obtener el archivo."}]
+                    }
+                }
+
+                return {ok: true, image: downloadedImage.image}
+            }
+        } catch (e) {
+            console.log(e)
+            return {
+                ok: false,
+                errors: [{message: "Existen problemas al momento de obtener los archivos de la evidencia."}]
+            }
+        }
+    }
 
 }

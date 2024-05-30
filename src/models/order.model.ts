@@ -9,7 +9,6 @@ export class OrderModel extends Model {
     public delivery_hour_id: number;
     public uuid: string;
     public order_number: string;
-    public total_products: number;
     public delivery_date: string;
     public subtotal: string;
     public discount: string;
@@ -39,7 +38,6 @@ OrderModel.init({
     delivery_hour_id: {type: DataTypes.INTEGER},
     uuid: {type: DataTypes.STRING},
     order_number: {type: DataTypes.STRING},
-    total_products: {type: DataTypes.INTEGER},
     delivery_date: {type: DataTypes.DATE},
     subtotal: {type: DataTypes.DECIMAL},
     discount: {type: DataTypes.DECIMAL},
