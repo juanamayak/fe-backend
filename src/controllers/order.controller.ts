@@ -87,12 +87,14 @@ export class OrderController {
             delivery_hour_id: body.delivery_hour_id,
             order_number: `OR${client_id}${moment().unix()}`,
             subtotal: parseFloat(body.subtotal),
-            special_price: parseFloat(body.special_price),
+            special_price: body.special_price !== '' ? parseFloat(body.special_price) : null,
             delivery_price: parseFloat(body.delivery_price),
             total: parseFloat(body.total),
             currency: 'MXN',
             status: 0 // borrador creado
         }
+
+        console.log(data);
 
         let orderCreated = await OrderController.ordersQueries.create(data);
 

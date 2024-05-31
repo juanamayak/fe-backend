@@ -97,6 +97,7 @@ export class Routes {
 
         /* RUTAS DIRECCIONES */
         app.route('/api/addresses').get(this.addressController.index);
+        app.route('/api/addresses/client').get(CheckHeaders.validateJWTClient, this.addressController.clientAddresses);
         app.route('/api/addresses/create').post(CheckHeaders.validateJWTClient, this.addressController.store);
         app.route('/api/addresses/update/:uuid').put(this.addressController.update);
         app.route('/api/addresses/delete/:uuid').put(this.addressController.delete);
@@ -124,5 +125,9 @@ export class Routes {
         // RUTAS DE ROLES AND PERMISSIONS
         app.route('/api/roles').get(this.rolesController.index);
         app.route('/api/permissions/assign').get(this.permissionsController.assign);
+
+        // RUTAS DE MENSAJES
+        app.route('/api/messages').get(this.messagesController.index);
+
     }
 }

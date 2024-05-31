@@ -42,6 +42,29 @@ export class AddressQueries {
         }
     }
 
+    public async clientAddresses(clientId: any) {
+        try {
+            let data = await AddressModel.findAll(
+                {
+                    where: {
+                        client_id: clientId,
+                        status: [1]
+                    },
+                    order: [["createdAt", "DESC"]],
+                    include: [
+                        { model: CountryModel, as: 'country' },
+                        { model: StateModel, as: 'state' },
+                        { model: CityModel, as: 'city' }
+                    ]
+                },
+            )
+            return {ok: true, data}
+        } catch (e) {
+            console.log(e)
+            return {ok: false}
+        }
+    }
+
     public async create(data) {
         try {
             let address = await AddressModel.create(data);

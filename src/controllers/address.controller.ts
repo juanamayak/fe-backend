@@ -29,6 +29,24 @@ export class AddressController {
         })
     }
 
+    public async clientAddresses(req: Request, res: Response) {
+        const client_id = req.body.client_id;
+
+        let addresses = await AddressController.addressesQueries.clientAddresses(client_id)
+
+        if (!addresses.ok) {
+            return res.status(JsonResponse.BAD_REQUEST).json({
+                ok: false,
+                errors: [{message: 'Algo salio mal a la hora de traer las direcciones.'}]
+            });
+        }
+
+        return res.status(JsonResponse.OK).json({
+            ok: true,
+            addresses: addresses.data,
+        })
+    }
+
     public async store(req: Request, res: Response) {
         const body = req.body;
         const client_id = req.body.client_id;
