@@ -118,6 +118,7 @@ export class Routes {
         // RUTAS DE ORDENES
         app.route('/api/orders/:uuid').get(this.ordersController.show);
         app.route('/api/orders/create').post(CheckHeaders.validateJWTClient, this.ordersController.store);
+        app.route('/api/orders/payment').post(CheckHeaders.validateJWTClient, this.ordersController.payment);
 
         // RUTAS DE HORARIOS
         app.route('/api/hours').get(this.deliveryHoursController.index);

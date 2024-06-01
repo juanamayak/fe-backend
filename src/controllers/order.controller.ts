@@ -7,12 +7,14 @@ import {OrderValidator} from "../validators/order.validator";
 import {OrderQueries} from "../queries/order.queries";
 import moment from "moment";
 import {OrderProductQueries} from "../queries/order_product.queries";
+import Stripe from 'stripe';
 
 export class OrderController {
 
     static ordersQueries: OrderQueries = new OrderQueries();
     static ordersProductQueries: OrderProductQueries = new OrderProductQueries();
     static ordersValidator: OrderValidator = new OrderValidator();
+
 
     public async show(req: Request, res: Response) {
         const errors = [];
@@ -129,6 +131,38 @@ export class OrderController {
             message: 'La orden se creo exitosamente',
             order: orderCreated.data.uuid
         });
+    }
+
+    public async payment(req: Request, res: Response) {
+        const stripe = new Stripe('sk_test_4eC39HqLyjWDarjtT1zdp7dc', {
+            apiVersion: '2024-04-10',
+        });
+        const { amount, currency, description } = req.body;
+
+        try {
+            const paymentLink = await stripe.checkout.sessions.create({
+                payment_method_types: ['card'],
+                line_items: [
+                    {
+                        price_data: {
+                            currency: 'usd',
+                            product_data: {
+                                name: 'Nombre del producto',
+                            },
+                            unit_amount: 2000, // Monto en centavos
+                        },
+                        quantity: 1,
+                    },
+                ],
+                mode: 'payment',
+                success_url: 'https://tu-sitio.com/success',
+                cancel_url: 'https://tu-sitio.com/cancel',
+            });
+
+            res.status(200).send({ url: paymentLink.url });
+        } catch (error) {
+            res.status(500).send({ error: error.message });
+        }
     }
 
     /*public async update(req: Request, res: Response) {
