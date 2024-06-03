@@ -134,10 +134,8 @@ export class OrderController {
     }
 
     public async payment(req: Request, res: Response) {
-        const stripe = new Stripe('sk_test_4eC39HqLyjWDarjtT1zdp7dc', {
-            apiVersion: '2024-04-10',
-        });
-        const { amount, currency, description } = req.body;
+        const body = req.body;
+        const stripe = new Stripe(process.env.STRIPE_SECRET, {apiVersion: '2024-04-10'});
 
         try {
             const paymentLink = await stripe.checkout.sessions.create({
@@ -145,23 +143,50 @@ export class OrderController {
                 line_items: [
                     {
                         price_data: {
-                            currency: 'usd',
+                            currency: body.currency,
                             product_data: {
-                                name: 'Nombre del producto',
+                                name: 'Pedido FloreriaEnvios',
+                                description: `Número de orden: ${body.order_number}`,
+                                images: ['https://floreriaenvios.com/logotipo.png']
                             },
-                            unit_amount: 2000, // Monto en centavos
+                            unit_amount: Math.round(body.total * 100), // Monto en centavos
                         },
                         quantity: 1,
                     },
                 ],
                 mode: 'payment',
                 success_url: 'https://tu-sitio.com/success',
-                cancel_url: 'https://tu-sitio.com/cancel',
+                cancel_url: 'https://tu-sitio.com/cancel'
             });
+
+            console.log(paymentLink);
 
             res.status(200).send({ url: paymentLink.url });
         } catch (error) {
             res.status(500).send({ error: error.message });
+        }
+    }
+
+    public async intent(req: Request, res: Response) {
+        const body = req.body;
+        const stripe = new Stripe(process.env.STRIPE_SECRET, {apiVersion: '2024-04-10'});
+
+        try {
+            const paymentIntent = await stripe.paymentIntents.create({
+                amount: body.amount,
+                currency: body.currency
+            });
+
+            return res.status(JsonResponse.OK).json({
+                ok: true,
+                message: 'La intento se creo exitosamente',
+                clientSecret: paymentIntent.client_secret
+            });
+        } catch (error) {
+            return res.status(JsonResponse.BAD_REQUEST).json({
+                ok: false,
+                errors: [{ message: error.message}]
+            });
         }
     }
 
