@@ -3,18 +3,18 @@ import {AddressModel} from '../models/address.model'
 import {CountryModel} from "../models/country.model";
 import {StateModel} from "../models/state.model";
 import {CityModel} from "../models/city.model";
-import {OrderModel} from "../models/order.model";
+import {PaymentModel} from "../models/payment.model";
 
-export class OrderQueries {
+export class PaymentQueries {
 
-    public async show(body: any) {
+    public async show(data: any) {
         try {
-            const data = await OrderModel.findOne({
+            const address = await AddressModel.findOne({
                 where: {
-                    uuid: body.uuid
+                    uuid: data.uuid
                 }
             })
-            return {ok: true, data}
+            return {ok: true, address}
         } catch (e) {
             console.log(e)
             return {ok: false}
@@ -43,9 +43,22 @@ export class OrderQueries {
         }
     }
 
-    public async create(body) {
+    public async clientAddresses(clientId: any) {
         try {
-            let data = await OrderModel.create(body);
+            let data = await AddressModel.findAll(
+                {
+                    where: {
+                        client_id: clientId,
+                        status: [1]
+                    },
+                    order: [["createdAt", "DESC"]],
+                    include: [
+                        { model: CountryModel, as: 'country' },
+                        { model: StateModel, as: 'state' },
+                        { model: CityModel, as: 'city' }
+                    ]
+                },
+            )
             return {ok: true, data}
         } catch (e) {
             console.log(e)
@@ -53,15 +66,25 @@ export class OrderQueries {
         }
     }
 
-    public async update(orderId: any, body: any) {
+    public async create(body) {
         try {
-            let data = await OrderModel.update(
-                body, {
+            let data = await PaymentModel.create(body);
+            return {ok: true, data}
+        } catch (e) {
+            console.log(e)
+            return {ok: false}
+        }
+    }
+
+    public async update(addressId: any, data: any) {
+        try {
+            let address = await AddressModel.update(
+                data, {
                     where: {
-                        id: orderId,
+                        id: addressId,
                     }
                 })
-            return {ok: true, data}
+            return {ok: true, address}
         } catch (e) {
             console.log(e)
             return {ok: false}

@@ -120,8 +120,9 @@ export class Routes {
         // RUTAS DE ORDENES
         app.route('/api/orders/:uuid').get(this.ordersController.show);
         app.route('/api/orders/create').post(CheckHeaders.validateJWTClient, this.ordersController.store);
-        // RUTAS DE PAYMENTS
+        app.route('/api/orders/update/:uuid').put(CheckHeaders.validateJWTClient, this.ordersController.update);
 
+        // RUTAS DE PAYMENTS
         app.route('/api/payment/intent').post(this.paymentController.intent);
         app.route('/api/payment/create').post(CheckHeaders.validateJWTClient, this.paymentController.store);
 

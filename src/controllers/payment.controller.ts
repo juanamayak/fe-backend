@@ -8,19 +8,20 @@ import {OrderQueries} from "../queries/order.queries";
 import moment from "moment";
 import {OrderProductQueries} from "../queries/order_product.queries";
 import Stripe from 'stripe';
+import {PaymentValidator} from "../validators/payment.validator";
+import {PaymentQueries} from "../queries/payment.queries";
 
 export class PaymentController {
 
-    static ordersQueries: OrderQueries = new OrderQueries();
-    static ordersProductQueries: OrderProductQueries = new OrderProductQueries();
-    static ordersValidator: OrderValidator = new OrderValidator();
+    static paymentQueries: PaymentQueries = new PaymentQueries();
+    static paymentValidator: PaymentValidator = new PaymentValidator();
 
     public async store(req: Request, res: Response) {
         const body = req.body;
         const client_id = req.body.client_id;
 
         // Validacion del request
-        const validatedData = await PaymentController.ordersValidator.validateCreate(body)
+        const validatedData = await PaymentController.paymentValidator.validateStore(body)
 
         if (!validatedData.ok) {
             return res.status(JsonResponse.BAD_REQUEST).json({
@@ -30,24 +31,20 @@ export class PaymentController {
         }
 
         const data = {
-            client_id,
             uuid: uuidv4(),
-            delivery_date: body.delivery_date,
-            delivery_hour_id: body.delivery_hour_id,
-            order_number: `OR${client_id}${moment().unix()}`,
-            subtotal: parseFloat(body.subtotal),
-            special_price: body.special_price !== '' ? parseFloat(body.special_price) : null,
-            delivery_price: parseFloat(body.delivery_price),
-            total: parseFloat(body.total),
-            currency: 'MXN',
-            status: 0 // borrador creado
+            order_id: body.order_id,
+            transaction: body.transaction,
+            payment_date: body.payment_date,
+            payment_method: body.payment_method,
+            payment_status: body.payment_status,
+            currency: body.currency,
+            payer_name: body.payer_name,
+            payer_email: body.payer_email
         }
 
-        console.log(data);
+        let paymentCreated = await PaymentController.paymentQueries.create(data);
 
-        let orderCreated = await PaymentController.ordersQueries.create(data);
-
-        if (!orderCreated.ok) {
+        if (!paymentCreated.ok) {
             return res.status(JsonResponse.BAD_REQUEST).json({
                 ok: false,
                 errors: [{ message: "Existen problemas al momento de crear la orden. Intente más tarde."}]
@@ -57,7 +54,7 @@ export class PaymentController {
         return res.status(JsonResponse.OK).json({
             ok: true,
             message: 'La orden se creo exitosamente',
-            order: orderCreated.data.uuid
+            payment: paymentCreated.data
         });
     }
 

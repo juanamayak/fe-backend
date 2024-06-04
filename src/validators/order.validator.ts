@@ -46,38 +46,14 @@ export class OrderValidator {
         const errors = []
 
         try {
-            const country_id: number = !body.country_id ?
-                errors.push({message: 'El país es obligatorio'}) : body.country_id;
+            const address_id: number = !body.address_id ?
+                errors.push({message: 'El país es obligatorio'}) : body.address_id;
 
-            const state_id: number = !body.state_id ?
-                errors.push({message: 'El estado es obligatorio'}) : body.state_id;
+            const message: string = !body.message || validator.isEmpty(body.message) ?
+                errors.push({message: 'El mensaje es obligatorio'}) : body.message;
 
-            const city_id: number = !body.city_id ?
-                errors.push({message: 'La ciudad es obligatoria'}) : body.city_id;
-
-            const name_receiver: string = !body.name_receiver || validator.isEmpty(body.name_receiver) ?
-                errors.push({message: 'El nombre del destinatario es obligatorio'}) : body.name_receiver;
-
-            const phone_receiver: string = !body.phone_receiver || validator.isEmpty(body.phone_receiver) ?
-                errors.push({message: 'El número del destinatario es obligatorio'}) : body.phone_receiver;
-
-            const address: string = !body.address || validator.isEmpty(body.address) ?
-                errors.push({message: 'La dirección de entrega es oblitaria'}) : body.address;
-
-            const colony: string = !body.colony || validator.isEmpty(body.colony) ?
-                errors.push({message: 'La colonia de la dirección es oblitaria'}) : body.colony;
-
-            const references: string = !body.references || validator.isEmpty(body.references) ?
-                errors.push({message: 'La referencia es obligatoria'}) : body.references;
-
-            /*const latitude: string = !body.latitude || validator.isEmpty(body.latitude) ?
-                errors.push({message: 'La posición en el mapa es obligatorio'}) : body.latitude;
-
-            const longitude: string = !body.longitude || validator.isEmpty(body.longitude) ?
-                errors.push({message: 'La posición en el mapa es obligatorio'}) : body.longitude;*/
-
-            const zip: number = !body.zip || validator.isEmpty(body.zip) ?
-                errors.push({message: 'El código postal es obligatorio'}) : body.zip;
+            const sign: string = !body.sign || validator.isEmpty(body.sign) ?
+                errors.push({message: 'La firma es obligatoria'}) : body.sign;
 
             if (errors.length > 0) {
                 return {

@@ -96,7 +96,6 @@ export class OrderController {
             status: 0 // borrador creado
         }
 
-        console.log(data);
 
         let orderCreated = await OrderController.ordersQueries.create(data);
 
@@ -133,68 +132,11 @@ export class OrderController {
         });
     }
 
-    public async payment(req: Request, res: Response) {
-        const body = req.body;
-        const stripe = new Stripe(process.env.STRIPE_SECRET, {apiVersion: '2024-04-10'});
-
-        try {
-            const paymentLink = await stripe.checkout.sessions.create({
-                payment_method_types: ['card'],
-                line_items: [
-                    {
-                        price_data: {
-                            currency: body.currency,
-                            product_data: {
-                                name: 'Pedido FloreriaEnvios',
-                                description: `Número de orden: ${body.order_number}`,
-                                images: ['https://floreriaenvios.com/logotipo.png']
-                            },
-                            unit_amount: Math.round(body.total * 100), // Monto en centavos
-                        },
-                        quantity: 1,
-                    },
-                ],
-                mode: 'payment',
-                success_url: 'https://tu-sitio.com/success',
-                cancel_url: 'https://tu-sitio.com/cancel'
-            });
-
-            console.log(paymentLink);
-
-            res.status(200).send({ url: paymentLink.url });
-        } catch (error) {
-            res.status(500).send({ error: error.message });
-        }
-    }
-
-    public async intent(req: Request, res: Response) {
-        const body = req.body;
-        const stripe = new Stripe(process.env.STRIPE_SECRET, {apiVersion: '2024-04-10'});
-
-        try {
-            const paymentIntent = await stripe.paymentIntents.create({
-                amount: body.amount,
-                currency: body.currency
-            });
-
-            return res.status(JsonResponse.OK).json({
-                ok: true,
-                message: 'La intento se creo exitosamente',
-                clientSecret: paymentIntent.client_secret
-            });
-        } catch (error) {
-            return res.status(JsonResponse.BAD_REQUEST).json({
-                ok: false,
-                errors: [{ message: error.message}]
-            });
-        }
-    }
-
-    /*public async update(req: Request, res: Response) {
+    public async update(req: Request, res: Response) {
         const body = req.body;
         const errors = [];
 
-        const addressUuid = !req.params.uuid || validator.isEmpty(req.params.uuid) ?
+        const orderUuid = !req.params.uuid || validator.isEmpty(req.params.uuid) ?
             errors.push({message: 'Favor de proporcionar la dirección'}) : req.params.uuid;
 
         if (errors.length > 0) {
@@ -205,7 +147,7 @@ export class OrderController {
         }
 
         // Validacion del request
-        const validatedData = await OrderController.addressesValidator.validateUpdate(body);
+        const validatedData = await OrderController.ordersValidator.validateUpdate(body);
 
         if (!validatedData.ok) {
             return res.status(JsonResponse.BAD_REQUEST).json({
@@ -214,13 +156,13 @@ export class OrderController {
             });
         }
 
-        const address = await OrderController.addressesQueries.show({
-            uuid: addressUuid
+        const order = await OrderController.ordersQueries.show({
+            uuid: orderUuid
         });
 
-        if (!address.ok) {
+        if (!order.ok) {
             errors.push({message: 'Existen problemas al buscar el registro solicitado'});
-        } else if (!address.address) {
+        } else if (!order.data) {
             errors.push({message: 'El registro no se encuentra dado de alta'});
         }
 
@@ -231,9 +173,19 @@ export class OrderController {
             });
         }
 
-        const updateAddress = await OrderController.addressesQueries.update(address.address.id, body);
+        const data = {
+            address_id: body.address_id,
+            message: body.message,
+            sign: body.sign,
+            status: 1 // pendiente
 
-        if (!updateAddress.address) {
+        }
+
+        console.log(data);
+
+        const updatedOrder = await OrderController.ordersQueries.update(order.data.id, body);
+
+        if (!updatedOrder.data) {
             errors.push({message: 'Se encontro un problema a la hora de actualizar la dirección. Intente de nuevamente'});
         }
 
@@ -250,7 +202,7 @@ export class OrderController {
         });
     }
 
-    public async delete(req: Request, res: Response) {
+    /*public async delete(req: Request, res: Response) {
         const body = req.body;
         const errors = [];
 
