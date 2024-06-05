@@ -45,15 +45,15 @@ export class CartQueries {
         }
     }
 
-    public async update(cartId: any, data: any) {
+    public async update(cartId: any, body: any) {
         try {
-            let cart = await CartModel.update(
-                data, {
+            let data = await CartModel.update(
+                body, {
                     where: {
                         id: cartId,
                     }
                 })
-            return {ok: true, cart}
+            return {ok: true, data}
         } catch (e) {
             console.log(e)
             return {ok: false}

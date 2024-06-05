@@ -8,12 +8,15 @@ import {OrderQueries} from "../queries/order.queries";
 import moment from "moment";
 import {OrderProductQueries} from "../queries/order_product.queries";
 import Stripe from 'stripe';
+import {ImageQueries} from "../queries/image.queries";
+import {File} from "../helpers/files";
 
 export class OrderController {
-
+    static file: File = new File();
     static ordersQueries: OrderQueries = new OrderQueries();
     static ordersProductQueries: OrderProductQueries = new OrderProductQueries();
     static ordersValidator: OrderValidator = new OrderValidator();
+    static imageQueries: ImageQueries = new ImageQueries();
 
 
     public async show(req: Request, res: Response) {
@@ -46,9 +49,63 @@ export class OrderController {
             });
         }
 
+        // 2. Obtenemos las imagenes de cada producto
+        let tempProductsData: any;
+        let productsWithImages = [];
+        for (const product of order.data['products']) {
+            const image = await OrderController.imageQueries.productImage({
+                imageable_id: product.id
+            })
+
+            if (!image.ok) {
+                return res.status(JsonResponse.BAD_REQUEST).json({
+                    ok: false,
+                    errors: [{message: "Existen problemas al momento de obtener los archivos de evidencia del operador."}]
+                })
+            }
+
+            let downloadedImages: any;
+            if (image.image) {
+                downloadedImages = await OrderController.downloadImages(image.image);
+
+                if (!downloadedImages.ok) {
+                    return res.status(JsonResponse.BAD_REQUEST).json({
+                        ok: false,
+                        errors: downloadedImages.errors
+                    })
+                }
+            }
+
+            tempProductsData = {
+                id: product.id,
+                user_id: product.user_id,
+                category_id: product.category_id,
+                uuid: product.uuid,
+                name: product.name,
+                price: product.price,
+                sku: product.sku,
+                discount_percent: product.discount_percent,
+                description: product.description,
+                image: downloadedImages.image,
+                status: product.status,
+                createdAt: product.createdAt,
+                updatedAt: product.updatedAt
+            }
+
+            productsWithImages.push(tempProductsData);
+        }
+
+        const orderSimplified = {
+            order_number: order.data.order_number,
+            delivery_date: order.data.delivery_date,
+            status: order.data.status,
+            total: order.data.total,
+            products: productsWithImages
+        };
+
         return res.status(JsonResponse.OK).json({
             ok: true,
-            order: order.data
+            order: orderSimplified
         });
     }
 
@@ -251,4 +308,41 @@ export class OrderController {
             message: 'El registro se elimino correctamente.'
         });
     }*/
+
+    private static async downloadImages(images: any) {
+        try {
+            const base64Images = []
+            if(Array.isArray(images)) {
+                for (const image of images) {
+                    const downloadedImage = await OrderController.file.download(image, 'product')
+
+                    if (!downloadedImage.ok) {
+                        return {
+                            ok: false,
+                            errors: [{message: "Existen problemas al momento de obtener el archivo."}]
+                        }
+                    }
+
+                    base64Images.push(downloadedImage.image)
+                }
+                return {ok: true, base64Images}
+            } else {
+                const downloadedImage = await OrderController.file.download(images, 'product')
+                if (!downloadedImage.ok) {
+                    return {
+                        ok: false,
+                        errors: [{message: "Existen problemas al momento de obtener el archivo."}]
+                    }
+                }
+
+                return {ok: true, image: downloadedImage.image}
+            }
+        } catch (e) {
+            console.log(e)
+            return {
+                ok: false,
+                errors: [{message: "Existen problemas al momento de obtener los archivos de la evidencia."}]
+            }
+        }
+    }
 }

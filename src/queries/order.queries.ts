@@ -4,6 +4,7 @@ import {CountryModel} from "../models/country.model";
 import {StateModel} from "../models/state.model";
 import {CityModel} from "../models/city.model";
 import {OrderModel} from "../models/order.model";
+import {ProductModel} from "../models/product.model";
 
 export class OrderQueries {
 
@@ -12,7 +13,10 @@ export class OrderQueries {
             const data = await OrderModel.findOne({
                 where: {
                     uuid: body.uuid
-                }
+                },
+                include: [
+                    { model: ProductModel, as: 'products' },
+                ]
             })
             return {ok: true, data}
         } catch (e) {

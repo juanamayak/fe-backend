@@ -101,5 +101,16 @@ export default class Relationship {
             as: 'products'
         });
 
+        ProductModel.belongsToMany(OrderModel, {
+            through: 'OrderProductModel',
+            foreignKey: 'product_id',
+            as: 'order'
+        });
+        OrderModel.belongsToMany(ProductModel, {
+            through: 'OrderProductModel', // Nombre de la tabla intermedia
+            foreignKey: 'order_id', // Nombre de la columna que hace referencia al id de la subcategoría
+            as: 'products'
+        });
+
     }
 }

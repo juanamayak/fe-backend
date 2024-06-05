@@ -115,6 +115,7 @@ export class Routes {
         // RUTAS DE CARRITO DE COMPRAS
         app.route('/api/cart').get(CheckHeaders.validateJWTClient, this.cartController.show);
         app.route('/api/cart/create').post(CheckHeaders.validateJWTClient, this.cartController.store);
+        app.route('/api/cart/update/:id').put(CheckHeaders.validateJWTClient, this.cartController.update);
         app.route('/api/cart/quantity/:productId').put(CheckHeaders.validateJWTClient, this.cartController.quantity);
 
         // RUTAS DE ORDENES
