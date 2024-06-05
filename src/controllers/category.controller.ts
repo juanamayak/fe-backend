@@ -26,6 +26,8 @@ export class CategoryController {
             });
         }
 
+        console.log('hola')
+
         const category = await CategoryController.categoriesQueries.show({
             uuid: categoryUuid
         });
