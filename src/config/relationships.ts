@@ -20,6 +20,8 @@ import {ProviderModel} from "../models/provider.model";
 import {ImageModel} from "../models/image.model";
 import {ProductProviderModel} from "../models/product_provider.model";
 import {CartProductModel} from "../models/cart_product.model";
+import {OrderController} from "../controllers/order.controller";
+import {PaymentModel} from "../models/payment.model";
 
 export default class Relationship {
     static init() {
@@ -111,6 +113,8 @@ export default class Relationship {
             foreignKey: 'order_id', // Nombre de la columna que hace referencia al id de la subcategoría
             as: 'products'
         });
+
+        OrderModel.belongsTo(AddressModel, {foreignKey: 'address_id', as: 'addresses'});
 
     }
 }

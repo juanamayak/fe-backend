@@ -5,6 +5,7 @@ import {StateModel} from "../models/state.model";
 import {CityModel} from "../models/city.model";
 import {OrderModel} from "../models/order.model";
 import {ProductModel} from "../models/product.model";
+import {PaymentModel} from "../models/payment.model";
 
 export class OrderQueries {
 
@@ -15,7 +16,13 @@ export class OrderQueries {
                     uuid: body.uuid
                 },
                 include: [
-                    { model: ProductModel, as: 'products' },
+                    {
+                        model: AddressModel, as: 'addresses',
+                        include: [
+                            { model: StateModel, as: 'state' },
+                            { model: CityModel, as: 'city' },
+                        ]
+                    }
                 ]
             })
             return {ok: true, data}
@@ -34,9 +41,9 @@ export class OrderQueries {
                     },
                     order: [["createdAt", "DESC"]],
                     include: [
-                        { model: CountryModel, as: 'country' },
-                        { model: StateModel, as: 'state' },
-                        { model: CityModel, as: 'city' }
+                        {model: CountryModel, as: 'country'},
+                        {model: StateModel, as: 'state'},
+                        {model: CityModel, as: 'city'}
                     ]
                 },
             )
