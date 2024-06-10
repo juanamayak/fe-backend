@@ -184,9 +184,7 @@ export class OrderController {
 
         }
 
-        console.log(data);
-
-        const updatedOrder = await OrderController.ordersQueries.update(order.data.id, body);
+        const updatedOrder = await OrderController.ordersQueries.update(order.data.id, data);
 
         if (!updatedOrder.data) {
             errors.push({message: 'Se encontro un problema a la hora de actualizar la dirección. Intente de nuevamente'});

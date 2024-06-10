@@ -65,7 +65,9 @@ export class PaymentController {
         try {
             const paymentIntent = await stripe.paymentIntents.create({
                 amount: body.amount,
-                currency: body.currency
+                currency: body.currency,
+                payment_method_types: [body.payment_method],
+                description: 'Compra en FloreriaEnvios.com',
             });
 
             return res.status(JsonResponse.OK).json({
