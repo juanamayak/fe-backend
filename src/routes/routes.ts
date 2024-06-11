@@ -127,6 +127,9 @@ export class Routes {
         app.route('/api/payment/intent').post(this.paymentController.intent);
         app.route('/api/payment/create').post(CheckHeaders.validateJWTClient, this.paymentController.store);
 
+        // RUTAS DE STRIPE
+        app.route('/api/stripe/webhook').post(this.paymentController.webhook);
+
         // RUTAS DE HORARIOS
         app.route('/api/hours').get(this.deliveryHoursController.index);
 

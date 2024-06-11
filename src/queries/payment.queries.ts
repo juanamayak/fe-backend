@@ -7,19 +7,21 @@ import {PaymentModel} from "../models/payment.model";
 
 export class PaymentQueries {
 
-    public async show(data: any) {
+    public async showByTransaction(body: any) {
         try {
-            const address = await AddressModel.findOne({
+            const data = await PaymentModel.findOne({
                 where: {
-                    uuid: data.uuid
+                    transaction: body.transaction
                 }
             })
-            return {ok: true, address}
+            return {ok: true, data}
         } catch (e) {
             console.log(e)
             return {ok: false}
         }
     }
+
+
 
     public async index() {
         try {
@@ -76,15 +78,15 @@ export class PaymentQueries {
         }
     }
 
-    public async update(addressId: any, data: any) {
+    public async update(paymentId: any, body: any) {
         try {
-            let address = await AddressModel.update(
-                data, {
+            let data = await PaymentModel.update(
+                body, {
                     where: {
-                        id: addressId,
+                        id: paymentId,
                     }
                 })
-            return {ok: true, address}
+            return {ok: true, data}
         } catch (e) {
             console.log(e)
             return {ok: false}

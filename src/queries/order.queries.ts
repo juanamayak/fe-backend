@@ -6,6 +6,7 @@ import {CityModel} from "../models/city.model";
 import {OrderModel} from "../models/order.model";
 import {ProductModel} from "../models/product.model";
 import {PaymentModel} from "../models/payment.model";
+import {ClientModel} from "../models/client.model";
 
 export class OrderQueries {
 
@@ -22,6 +23,9 @@ export class OrderQueries {
                             { model: StateModel, as: 'state' },
                             { model: CityModel, as: 'city' },
                         ]
+                    },
+                    {
+                        model: ClientModel, as: 'client'
                     }
                 ]
             })

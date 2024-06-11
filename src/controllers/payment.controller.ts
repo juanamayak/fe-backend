@@ -83,4 +83,65 @@ export class PaymentController {
         }
     }
 
+    public async webhook(req: Request, res: Response) {
+        const event = req.body;
+        const errors = [];
+
+        switch (event.type) {
+            case 'payment_intent.succeeded':
+                const transaction = event.data.object.id;
+                const payment = await PaymentController.paymentQueries.showByTransaction({
+                    transaction: transaction
+                });
+
+                if (!payment.ok) {
+                    errors.push({message: 'Existen problemas al buscar el registro solicitado'});
+                } else if (!payment.data) {
+                    errors.push({message: 'El registro no se encuentra dado de alta'});
+                }
+
+                if (errors.length > 0) {
+                    return res.status(JsonResponse.BAD_REQUEST).json({
+                        ok: false,
+                        errors
+                    });
+                }
+
+                const updatedPayment = await PaymentController.paymentQueries.update(payment.data.id, {
+                    payment_status: event.data.object.status.toUpperCase()
+                });
+
+                if (!updatedPayment.data) {
+                    errors.push({message: 'Se encontro un problema a la hora de actualizar la dirección. Intente de nuevamente'});
+                }
+
+                if (errors.length > 0) {
+                    return res.status(JsonResponse.BAD_REQUEST).json({
+                        ok: false,
+                        errors
+                    });
+                }
+
+                break;
+            case 'payment_intent.payment_failed':
+                const failedPaymentIntent = event.data.object;
+                // Actualizar el estado del pedido a 'fallido' en la base de datos
+                console.log(failedPaymentIntent.metadata.orderId)
+                break;
+            case 'payment_intent.canceled':
+                const canceledPaymentIntent = event.data.object;
+                // Actualizar el estado del pedido a 'cancelado' en la base de datos
+                console.log(canceledPaymentIntent.metadata.orderId)
+                break;
+            default:
+                // Manejar otros tipos de eventos si es necesario
+                break;
+        }
+
+        return res.status(JsonResponse.OK).json({
+            ok: true,
+            message: 'El registro se actualizo correctamente'
+        });
+    }
+
 }

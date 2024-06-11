@@ -83,11 +83,9 @@ export default class Relationship {
         ClientModel.hasMany(CitySuggestionModel, {foreignKey: 'client_id'});
         CitySuggestionModel.belongsTo(ClientModel, {foreignKey: 'client_id'});
 
-        ClientModel.hasMany(OrderModel, {foreignKey: 'client_id'});
-        OrderModel.belongsTo(ClientModel, {foreignKey: 'client_id'});
+        // ClientModel.belongsTo(OrderModel, {foreignKey: 'client_id', as: 'client'});
+        OrderModel.belongsTo(ClientModel, {foreignKey: 'client_id', as: 'client'});
 
-        ClientModel.belongsToMany(OrderModel, {through: 'ClientOrderCouponModel', foreignKey: 'client_id'});
-        OrderModel.belongsToMany(ClientModel, {through: 'ClientOrderCouponModel', foreignKey: 'order_id'});
         ClientModel.belongsToMany(CouponModel, {through: 'ClientOrderCouponModel', foreignKey: 'client_id'});
         CouponModel.belongsToMany(ClientModel, {through: 'ClientOrderCouponModel', foreignKey: 'coupon_id'});
 
