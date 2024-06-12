@@ -24,7 +24,8 @@ export class CartQueries {
                         },
                         where: {
                             status: 1
-                        }
+                        },
+                        required: false
                     }
                 ]
             })

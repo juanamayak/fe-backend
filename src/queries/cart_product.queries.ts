@@ -72,10 +72,11 @@ export class CartProductQueries {
         }
     }
 
-    public async delete(productId: any) {
+    public async delete(id: any, productId: any) {
         try {
             let data = await CartProductModel.destroy({
                     where: {
+                        id,
                         product_id: productId,
                     }
                 })

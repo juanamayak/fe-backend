@@ -55,10 +55,12 @@ export class OrderController {
         });
     }
 
-    /*public async index(req: Request, res: Response) {
-        let addresses = await OrderController.addressesQueries.index()
+    public async index(req: Request, res: Response) {
+        const clientId = req.body.client_id;
 
-        if (!addresses.ok) {
+        let orders = await OrderController.ordersQueries.index(clientId);
+
+        if (!orders.ok) {
             return res.status(JsonResponse.BAD_REQUEST).json({
                 ok: false,
                 errors: [{message: 'Algo salio mal a la hora de traer las direcciones.'}]
@@ -67,9 +69,9 @@ export class OrderController {
 
         return res.status(JsonResponse.OK).json({
             ok: true,
-            addresses: addresses.addresses,
+            orders: orders.data,
         })
-    }*/
+    }
 
     public async store(req: Request, res: Response) {
         const body = req.body;

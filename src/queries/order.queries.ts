@@ -7,6 +7,7 @@ import {OrderModel} from "../models/order.model";
 import {ProductModel} from "../models/product.model";
 import {PaymentModel} from "../models/payment.model";
 import {ClientModel} from "../models/client.model";
+import {OrderController} from "../controllers/order.controller";
 
 export class OrderQueries {
 
@@ -21,8 +22,8 @@ export class OrderQueries {
                     {
                         model: AddressModel, as: 'addresses',
                         include: [
-                            { model: StateModel, as: 'state' },
-                            { model: CityModel, as: 'city' },
+                            {model: StateModel, as: 'state'},
+                            {model: CityModel, as: 'city'},
                         ]
                     },
                     {
@@ -37,22 +38,21 @@ export class OrderQueries {
         }
     }
 
-    public async index() {
+    public async index(clientId: any) {
         try {
-            let addresses = await AddressModel.findAll(
+            let data = await OrderModel.findAll(
                 {
                     where: {
+                        client_id: clientId,
                         status: [1]
                     },
-                    order: [["createdAt", "DESC"]],
                     include: [
-                        {model: CountryModel, as: 'country'},
-                        {model: StateModel, as: 'state'},
-                        {model: CityModel, as: 'city'}
-                    ]
+                        {model: ProductModel, as: 'products'}
+                    ],
+                    order: [["createdAt", "DESC"]],
                 },
             )
-            return {ok: true, addresses}
+            return {ok: true, data}
         } catch (e) {
             console.log(e)
             return {ok: false}

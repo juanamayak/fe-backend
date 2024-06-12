@@ -59,6 +59,7 @@ export class CartController {
 
     public async show(req: Request, res: Response) {
         const client_id = req.body.client_id;
+        const errors = [];
 
         let cart = await CartController.cartQueries.show(client_id)
 
@@ -72,6 +73,7 @@ export class CartController {
         // 2. Obtenemos las imagenes de cada producto
         let tempProductsData: any;
         let productsWithImages = [];
+
         for (const product of cart.data['products']) {
             const image = await CartController.imageQueries.productImage({
                 imageable_id: product.id
@@ -384,7 +386,7 @@ export class CartController {
 
         console.log(cartProduct);
 
-        const deletedCartProduct = await CartController.cartProductQueries.delete(cartProduct.data.id);
+        const deletedCartProduct = await CartController.cartProductQueries.delete(cartProduct.data.id, productId);
 
         if (!deletedCartProduct.ok) {
             errors.push({message: 'Existen problemas al momento de eliminar el registro. Intente de nuevamente'});
