@@ -286,6 +286,123 @@ export class CartController {
         });
     }
 
+    public async delete(req: Request, res: Response) {
+        const body = req.body;
+        const errors = [];
+
+        const cartId = !req.params.id || validator.isEmpty(req.params.id) ?
+            errors.push({message: 'Favor de proporcionar el carrito de compras.'}) : req.params.id
+
+        if (errors.length > 0) {
+            return res.status(JsonResponse.BAD_REQUEST).json({
+                ok: false,
+                errors
+            });
+        }
+
+        const findedCart = await CartController.cartQueries.show({
+            id: cartId
+        });
+
+        if (!findedCart.ok) {
+            errors.push({message: 'Existen problema al buscar el registro solicitado'});
+        } else if (!findedCart.data) {
+            errors.push({message: 'El registro no se encuentra dada de alta'});
+        }
+
+        if (errors.length > 0) {
+            return res.status(JsonResponse.BAD_REQUEST).json({
+                ok: false,
+                errors
+            });
+        }
+
+        const deletedCart = await CartController.cartQueries.delete(findedCart.data.id, { status: body.status});
+
+        if (!deletedCart.ok) {
+            errors.push({message: 'Existen problemas al momento de eliminar el registro. Intente de nuevamente'});
+        }
+
+        if (errors.length > 0) {
+            return res.status(JsonResponse.BAD_REQUEST).json({
+                ok: false,
+                errors
+            });
+        }
+
+        return res.status(JsonResponse.OK).json({
+            ok: true,
+            message: 'El registro se elimino correctamente.'
+        });
+    }
+
+    public async deleteItem(req: Request, res: Response) {
+        const body = req.body;
+        const client_id = req.body.client_id;
+        const errors = [];
+
+        const cart = await CartController.cartQueries.getActiveClientCart(client_id);
+
+        if (!cart.ok) {
+            errors.push({message: 'Existen problema al buscar el registro solicitado'});
+        } else if (!cart.data) {
+            errors.push({message: 'El registro no se encuentra dada de alta'});
+        }
+
+        if (errors.length > 0) {
+            return res.status(JsonResponse.BAD_REQUEST).json({
+                ok: false,
+                errors
+            });
+        }
+
+        const productId = !req.params.id || validator.isEmpty(req.params.id) ?
+            errors.push({message: 'Favor de proporcionar el producto a eliminar'}) : req.params.id;
+
+        if (errors.length > 0) {
+            return res.status(JsonResponse.BAD_REQUEST).json({
+                ok: false,
+                errors
+            });
+        }
+
+
+        const cartProduct = await CartController.cartProductQueries.show(cart.data.id, productId);
+
+        if (!cartProduct.ok) {
+            errors.push({message: 'Existen problema al buscar el registro solicitado'});
+        } else if (!cartProduct.data) {
+            errors.push({message: 'El registro no se encuentra dada de alta'});
+        }
+
+        if (errors.length > 0) {
+            return res.status(JsonResponse.BAD_REQUEST).json({
+                ok: false,
+                errors
+            });
+        }
+
+        console.log(cartProduct);
+
+        const deletedCartProduct = await CartController.cartProductQueries.delete(cartProduct.data.id);
+
+        if (!deletedCartProduct.ok) {
+            errors.push({message: 'Existen problemas al momento de eliminar el registro. Intente de nuevamente'});
+        }
+
+        if (errors.length > 0) {
+            return res.status(JsonResponse.BAD_REQUEST).json({
+                ok: false,
+                errors
+            });
+        }
+
+        return res.status(JsonResponse.OK).json({
+            ok: true,
+            message: 'El registro se elimino correctamente.'
+        });
+    }
+
     private static async downloadImages(images: any) {
         try {
             const base64Images = []

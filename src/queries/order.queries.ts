@@ -14,7 +14,8 @@ export class OrderQueries {
         try {
             const data = await OrderModel.findOne({
                 where: {
-                    uuid: body.uuid
+                    uuid: body.uuid,
+                    status: 0
                 },
                 include: [
                     {

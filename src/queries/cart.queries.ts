@@ -60,12 +60,12 @@ export class CartQueries {
         }
     }
 
-    public async delete(addressId: any, data: any) {
+    public async delete(cartId: any, body: any) {
         try {
-            let address = await AddressModel.update(
-                data, {
+            let data = await CartModel.update(
+                body, {
                     where: {
-                        id: addressId,
+                        id: cartId,
                     }
                 })
             return {ok: true}

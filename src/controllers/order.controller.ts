@@ -39,7 +39,7 @@ export class OrderController {
         if (!order.ok) {
             errors.push({message: 'Existen problemas al buscar el registro solicitado'});
         } else if (!order.data) {
-            errors.push({message: 'El registro no se encuentra dado de alta'});
+            errors.push({message: 'El registro no se encuentra o ya fue procesado'});
         }
 
         if (errors.length > 0) {
