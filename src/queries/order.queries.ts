@@ -43,13 +43,14 @@ export class OrderQueries {
             let data = await OrderModel.findAll(
                 {
                     where: {
-                        client_id: clientId,
-                        status: [1]
+                        client_id: clientId
                     },
                     include: [
-                        {model: ProductModel, as: 'products'}
+                        {model: ProductModel, as: 'products', required: false},
+
                     ],
                     order: [["createdAt", "DESC"]],
+
                 },
             )
             return {ok: true, data}
