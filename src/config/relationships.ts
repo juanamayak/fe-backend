@@ -22,6 +22,7 @@ import {ProductProviderModel} from "../models/product_provider.model";
 import {CartProductModel} from "../models/cart_product.model";
 import {OrderController} from "../controllers/order.controller";
 import {PaymentModel} from "../models/payment.model";
+import {DeliveryHourModel} from "../models/delivery_hour.model";
 
 export default class Relationship {
     static init() {
@@ -85,6 +86,7 @@ export default class Relationship {
 
         // ClientModel.belongsTo(OrderModel, {foreignKey: 'client_id', as: 'client'});
         OrderModel.belongsTo(ClientModel, {foreignKey: 'client_id', as: 'client'});
+        OrderModel.belongsTo(DeliveryHourModel, {foreignKey: 'delivery_hour_id', as: 'hours'});
 
         ClientModel.belongsToMany(CouponModel, {through: 'ClientOrderCouponModel', foreignKey: 'client_id'});
         CouponModel.belongsToMany(ClientModel, {through: 'ClientOrderCouponModel', foreignKey: 'coupon_id'});

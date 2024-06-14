@@ -144,4 +144,39 @@ export class PaymentController {
         });
     }
 
+    public async getPaymentByOrder(req: Request, res: Response) {
+        const errors = [];
+
+        const orderId = !req.params.orderId || validator.isEmpty(req.params.orderId) ?
+            errors.push({message: 'Favor de proporcionar la orden'}) : req.params.orderId;
+
+        if (errors.length > 0) {
+            return res.status(JsonResponse.BAD_REQUEST).json({
+                ok: false,
+                errors
+            });
+        }
+
+        const payment = await PaymentController.paymentQueries.showByOrder(orderId);
+
+
+        if (!payment.ok) {
+            errors.push({message: 'Existen problemas al buscar el registro solicitado'});
+        } else if (!payment.data) {
+            errors.push({message: 'El registro no se encuentra dado de alta'});
+        }
+
+        if (errors.length > 0) {
+            return res.status(JsonResponse.BAD_REQUEST).json({
+                ok: false,
+                errors
+            });
+        }
+
+        return res.status(JsonResponse.OK).json({
+            ok: true,
+            payment: payment.data
+        });
+    }
+
 }

@@ -8,6 +8,7 @@ import {ProductModel} from "../models/product.model";
 import {PaymentModel} from "../models/payment.model";
 import {ClientModel} from "../models/client.model";
 import {OrderController} from "../controllers/order.controller";
+import {DeliveryHourModel} from "../models/delivery_hour.model";
 
 export class OrderQueries {
 
@@ -15,8 +16,7 @@ export class OrderQueries {
         try {
             const data = await OrderModel.findOne({
                 where: {
-                    uuid: body.uuid,
-                    status: 0
+                    uuid: body.uuid
                 },
                 include: [
                     {
@@ -25,6 +25,12 @@ export class OrderQueries {
                             {model: StateModel, as: 'state'},
                             {model: CityModel, as: 'city'},
                         ]
+                    },
+                    {
+                        model: DeliveryHourModel, as: 'hours'
+                    },
+                    {
+                        model: ProductModel, as: 'products'
                     },
                     {
                         model: ClientModel, as: 'client'
@@ -38,7 +44,26 @@ export class OrderQueries {
         }
     }
 
-    public async index(clientId: any) {
+    public async index() {
+        try {
+            let data = await OrderModel.findAll(
+                {
+                    include: [
+                        {model: ProductModel, as: 'products', required: false},
+
+                    ],
+                    order: [["createdAt", "DESC"]],
+
+                },
+            )
+            return {ok: true, data}
+        } catch (e) {
+            console.log(e)
+            return {ok: false}
+        }
+    }
+
+    public async clientsIndex(clientId: any) {
         try {
             let data = await OrderModel.findAll(
                 {

@@ -21,7 +21,19 @@ export class PaymentQueries {
         }
     }
 
-
+    public async showByOrder(orderId: any) {
+        try {
+            const data = await PaymentModel.findOne({
+                where: {
+                    order_id: orderId
+                }
+            })
+            return {ok: true, data}
+        } catch (e) {
+            console.log(e)
+            return {ok: false}
+        }
+    }
 
     public async index() {
         try {

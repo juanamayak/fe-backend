@@ -55,10 +55,62 @@ export class OrderController {
         });
     }
 
+    public async clientsShow(req: Request, res: Response) {
+        const errors = [];
+
+        const orderUuid = !req.params.uuid || validator.isEmpty(req.params.uuid) ?
+            errors.push({message: 'Favor de proporcionar el producto'}) : req.params.uuid;
+
+        if (errors.length > 0) {
+            return res.status(JsonResponse.BAD_REQUEST).json({
+                ok: false,
+                errors
+            });
+        }
+
+        const order = await OrderController.ordersQueries.show({
+            uuid: orderUuid
+        });
+
+        if (!order.ok) {
+            errors.push({message: 'Existen problemas al buscar el registro solicitado'});
+        } else if (!order.data) {
+            errors.push({message: 'El registro no se encuentra o ya fue procesado'});
+        }
+
+        if (errors.length > 0) {
+            return res.status(JsonResponse.BAD_REQUEST).json({
+                ok: false,
+                errors
+            });
+        }
+
+        return res.status(JsonResponse.OK).json({
+            ok: true,
+            order: order.data
+        });
+    }
+
     public async index(req: Request, res: Response) {
+        let orders = await OrderController.ordersQueries.index();
+
+        if (!orders.ok) {
+            return res.status(JsonResponse.BAD_REQUEST).json({
+                ok: false,
+                errors: [{message: 'Algo salio mal a la hora de traer las direcciones.'}]
+            });
+        }
+
+        return res.status(JsonResponse.OK).json({
+            ok: true,
+            orders: orders.data,
+        })
+    }
+
+    public async clientsIndex(req: Request, res: Response) {
         const clientId = req.body.client_id;
 
-        let orders = await OrderController.ordersQueries.index(clientId);
+        let orders = await OrderController.ordersQueries.clientsIndex(clientId);
 
         if (!orders.ok) {
             return res.status(JsonResponse.BAD_REQUEST).json({
