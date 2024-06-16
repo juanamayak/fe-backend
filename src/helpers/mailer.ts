@@ -11,7 +11,7 @@ export class Mailer {
     constructor() {
         this.transporter = nodemailer.createTransport({
             host: process.env.EMAIL_HOST,
-            port: process.env.EMAIL_PORT,
+            port: parseInt(process.env.EMAIL_PORT, 10),
             secure: true, // true for 465, false for other ports
             auth: {
                 user: process.env.EMAIL_USER, // generated ethereal user

@@ -106,7 +106,7 @@ export class ClientController {
 
         const sendEmail = await ClientController.mailer.send({
             email: body.email,
-            subject: 'Alta de cuenta',
+            subject: 'Activación de cuenta FloreriaEnvios.com',
             template: 'activation',
         });
 

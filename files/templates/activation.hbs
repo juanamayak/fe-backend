@@ -1,92 +1,104 @@
-<!DOCTYPE html
-    PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-
-<html xmlns="http://www.w3.org/1999/xhtml">
-
+<html lang="en">
 <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-    <title>Correo de activación de cuenta</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <style>
+        p, a, h1, h2, h3, h4, h5, h6 {font-family: 'Roboto', sans-serif !important;}
+        h1{ font-size: 30px !important;}
+        h2{ font-size: 25px !important;}
+        h3{ font-size: 18px !important;}
+        h4{ font-size: 16px !important;}
+        p, a{font-size: 15px !important;}
+
+        .claseBoton{
+            width: 30%;
+            background-color: #fcae3b;
+            border: 2px solid #fcae3b;
+            color: black;
+            padding: 16px 32px;
+            text-align: center;
+            text-decoration: none;
+            font-weight: bold;
+            display: inline-block;
+            font-size: 16px;
+            margin: 4px 2px;
+            transition-duration: 0.4s;
+            cursor: pointer;
+        }
+        .claseBoton:hover{
+            background-color: #000000;
+            color: #ffffff;
+        }
+        .imag{
+            width: 20px;
+            height: 20px;
+        }
+        .contA{
+            margin: 0px 5px 0 5px;
+        }
+        .afooter{
+            color: #ffffff !important;
+            text-decoration: none;
+            font-size: 13px !important;
+        }
+    </style>
 </head>
+<body>
+<div style="width: 100%; background-color: #e3e3e3;">
+    <div style="padding: 20px 10px 20px 10px;">
+        <!-- Imagen inicial -->
+        <div style="background-color: #000000; padding: 10px 0px 10px 0px; width: 100%; text-align: center;">
+            <img src="/public/images/pretwor.png" alt="" style="width: 200px; height: 60px;">
+        </div>
+        <!-- Imagen inicial -->
 
-<body style="margin: 0; padding: 0;">
-    <table align="center" border="1" cellpadding="0" cellspacing="0" width="600">
-        <tr>
-            <td align="center" bgcolor="#fff" style="padding: 10px 0 10px 0;">
-                <img src="http://74.208.251.17/tys/public/syitgov.jpg"
-                    alt="Logo municipal" width="20%" style="display: block;" />
-            </td>
-        </tr>
-        <tr>
-            <td bgcolor="#ffffff" style="padding: 40px 30px 40px 30px;">
-                <table border="1" cellpadding="0" cellspacing="0" width="100%">
-                    <tr align="center">
-                        <td><strong>Activar mi cuenta</strong></td>
-                    </tr>
-                </table>
-                <table border="1" cellpadding="0" cellspacing="0" width="100%">
-                    <tr>
-                        <td width="260" valign="top">
-                            <table border="0" cellpadding="0" cellspacing="0" width="100%">
-                                <tr align="center">
-                                    <td><strong>En la aplicación móvil</strong></td>
-                                </tr>
-                                <tr>
-                                    <td align="center">
-                                        <img src="http://74.208.251.17/tys/public/movil.png" alt="" width="50%"
-                                            height="140" style="display: block;" />
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td align="center" style="padding: 10px 0 0 0;">
-                                        Si desea activar su cuenta por medio de nuestra aplicación móvil, favor
-                                        de iniciar sesión y proporcionar el siguiente código: {{data.codigo_activacion}}
-                                    </td>
-                                </tr>
-                            </table>
-                        </td>
-                        <td width="260" valign="top">
-                            <table border="0" cellpadding="0" cellspacing="0" width="100%">
-                                <tr align="center">
-                                    <td><strong>En la aplicación web</strong></td>
-                                </tr>
-                                <tr>
-                                    <td align="center">
-                                        <img src="http://74.208.251.17/tys/public/computadora.png" alt="" width="50%"
-                                            height="140" style="display: block;" />
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td align="center" style="padding: 10px 0 0 0;">
-                                        Si desea activar su cuenta por medio de nuestra plataforma web, favor
-                                        de entrar al siguiente enlace:
-                                        <br>
-                                        <a target="_blank"
-                                            href="{{data.plataforma}}usuario/activar/{{data.codigo_activacion}}">
-                                            Activar cuenta
-                                        </a>
-                                    </td>
-                                </tr>
-                            </table>
-                        </td>
-                    </tr>
-                </table>
-            </td>
-        </tr>
-        <tr>
-            <td bgcolor="#fff">
-                <p align="center" style="color: #000;">
-                    Av. 20 Norte entre Calles 8 y 10 Norte. Col. Centro.
-                    <br>
-                    Solidaridad. Q. Roo. C.P. 77710
-                    <br>
-                    Tel: (984) 877 3050
-                    <br>
-                    contacto@gobiernodesolidaridad.gob.mx
-                </p>
-            </td>
-        </tr>
-    </table>
+        <!-- Contenido principal -->
+        <div style="background-color: #ffffff; padding: 20px 0px 5px 0px; width: 100%; text-align: center;">
+            <h1>Titulo de la notificación</h1>
+            <p>Lorem ipsum dolor sit amet consectetur adipiscing elit augue, venenatis porta tellus bibendum
+                consequat ultricies nec fringilla sagittis, varius elementum et eget vel taciti blandit. Neque
+                fusce hac magna ligula ultricies gravida facilisi eget molestie, vivamus sodales ornare faucibus
+                sollicitudin netus mauris odio, tortor iaculis quisque penatibus convallis posuere nostra volutpat.
+                Primis urna laoreet donec aliquet id placerat natoque fusce, habitant volutpat ridiculus at massa nullam eget,
+                penatibus parturient a in purus vulputate per. Erat cras elementum facilisi eleifend etiam cursus, mus sed dictum et justo,
+                penatibus fusce sociosqu aliquam conubia.
+            </p>
+
+            <!-- Gracias -->
+            <p>Gracias por tu tiempo.</p>
+            <p style="margin-bottom: 50px;"><i>Atentamente:</i><br>Equipo Pretwor</p>
+
+            <!-- Botón -->
+            <a class="claseBoton" href="https://www.pretwor.com/">Pretwor</a>
+        </div>
+        <!-- Contenido principal -->
+
+        <!-- Footer -->
+        <div style="background-color: #282828; color: #ffffff; padding: 5px 0px 0px 0px; width: 100%; text-align: center;">
+            <!-- Redes sociales -->
+            <a href="https://www.facebook.com/pretwor" class="contA"><img src="/public/images/fb.png" class="imag" /></a>
+            <a href="https://www.instagram.com/pretwor/" class="contA"><img src="/public/images/ig.png" class="imag" /></a>
+            <a href="https://wa.me/573224294332" class="contA"><img src="/public/images/wapp.png" class="imag" /></a>
+            <a href="mailto:contacto@pretwor.com" class="contA"><img src="/public/images/em.png" class="imag" /></a>
+            <!-- Redes sociales -->
+
+            <h4>Soporte</h4>
+            <p style="font-size: 13px; padding: 0px 20px 0px 20px;">
+                Comunícate con nosotros por los siguientes medios:<br>
+                Correo: <a class="afooter" href="mailto:proyectos@pretwor.com">proyectos@pretwor.com</a><br>
+                Whatsapp: <a class="afooter" href="https://wa.me/573224294332">+57 322 429 4332</a><br>
+            </p>
+            <p style="background-color: black; padding: 10px 0px 10px 0px; font-size: 12px !important;">
+                © 2022 Pretwor, todos los derechos reservados.
+            </p>
+        </div>
+        <!-- Footer -->
+
+
+
+    </div>
+</div>
 </body>
-
 </html>
