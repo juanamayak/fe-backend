@@ -123,7 +123,7 @@ export class Routes {
         app.route('/api/orders').get(this.ordersController.index);
         app.route('/api/orders/:uuid').get(this.ordersController.show);
         app.route('/api/orders/clients/:uuid').get(this.ordersController.clientsShow);
-        app.route('/api/orders/clients').get(CheckHeaders.validateJWTClient, this.ordersController.clientsIndex);
+        app.route('/api/orders/index/clients').get(CheckHeaders.validateJWTClient, this.ordersController.clientsIndex);
         app.route('/api/orders/create').post(CheckHeaders.validateJWTClient, this.ordersController.store);
         app.route('/api/orders/update/:uuid').put(CheckHeaders.validateJWTClient, this.ordersController.update);
 

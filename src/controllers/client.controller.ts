@@ -104,11 +104,15 @@ export class ClientController {
             });
         }
 
-        const sendEmail = await ClientController.mailer.send({
-            email: body.email,
+        let configuration = {
             subject: 'Activación de cuenta FloreriaEnvios.com',
+            email: body.email,
             template: 'activation',
-        });
+            uuid: clientCreated.data.uuid,
+            code: clientCreated.data.verification_code
+        }
+
+        const sendEmail = await ClientController.mailer.send(configuration);
 
         return res.status(JsonResponse.OK).json({
             ok: true,

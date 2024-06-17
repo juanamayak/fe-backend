@@ -31,10 +31,10 @@ export class ClientQueries {
         }
     }
 
-    public async create(data) {
+    public async create(body) {
         try {
-            let client = await ClientModel.create(data);
-            return {ok: true, client}
+            let data = await ClientModel.create(body);
+            return {ok: true, data}
         } catch (e) {
             console.log(e)
             return {ok: false}
