@@ -29,6 +29,7 @@ jobs:
                     username: ${{ secrets.DIGITALOCEAN_SSH_USER }}
                     key: ${{ secrets.DIGITALOCEAN_SSH_KEY }}
                     script: |
+                        ssh ${{ secrets.DIGITALOCEAN_SSH_USER }}@${{ secrets.DIGITALOCEAN_IP }} 
                         rsync -avz --delete dist/** package.json package-lock.json ${{ secrets.DIGITALOCEAN_SSH_USER }}@${{ secrets.DIGITALOCEAN_IP }}:/var/www/html/api.floreriaenvios.com &&
                         ssh ${{ secrets.DIGITALOCEAN_SSH_USER }}@${{ secrets.DIGITALOCEAN_IP }} "cd /var/www/html/api.floreriaenvios.com && npm install && pm2 stop api.floreriaenvios.com && pm2 start server.js --name api.floreriaenvios.com -o out.log -e error.log"
 
