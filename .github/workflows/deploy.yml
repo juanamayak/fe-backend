@@ -22,32 +22,17 @@ jobs:
             -   name: 'Run Build'
                 run: npx tsc
 
-            -   name: 'Copy files via SSH'
-                env:
-                    DIGITALOCEAN_HOST: ${{ secrets.DIGITALOCEAN_HOST }}
-                    DIGITALOCEAN_USER: ${{ secrets.DIGITALOCEAN_USER }}
-                    DIGITALOCEAN_PASSWORD: ${{ secrets.DIGITALOCEAN_PASSWORD }}
-                run: |
-                    sudo apt-get install -y sshpass
-                    sshpass -p "$DIGITALOCEAN_PASSWORD" ssh -o StrictHostKeyChecking=no $DIGITALOCEAN_USER@$DIGITALOCEAN_HOST "mkdir -p /var/www/api.floreriaenvios.com"
-                    sshpass -p "$DIGITALOCEAN_PASSWORD" rsync -avz --exclude node_modules --exclude .git . $DIGITALOCEAN_USER@$DIGITALOCEAN_HOST:/var/www/api.floreriaenvios.com
-
-            -   name: 'Install dependencies on server'
-                env:
-                    DIGITALOCEAN_HOST: ${{ secrets.DIGITALOCEAN_HOST }}
-                    DIGITALOCEAN_USER: ${{ secrets.DIGITALOCEAN_USER }}
-                    DIGITALOCEAN_PASSWORD: ${{ secrets.DIGITALOCEAN_PASSWORD }}
-                run: |
-                    sshpass -p "$DIGITALOCEAN_PASSWORD" ssh -o StrictHostKeyChecking=no $DIGITALOCEAN_USER@$DIGITALOCEAN_HOST "cd /var/www/api.floreriaenvios.com && npm install"
-
-            -   name: Restart applicationss
-                env:
-                    DIGITALOCEAN_HOST: ${{ secrets.DIGITALOCEAN_HOST }}
-                    DIGITALOCEAN_USER: ${{ secrets.DIGITALOCEAN_USER }}
-                    DIGITALOCEAN_PASSWORD: ${{ secrets.DIGITALOCEAN_PASSWORD }}
-                run: |
-                    sshpass -p "$DIGITALOCEAN_PASSWORD" ssh -o StrictHostKeyChecking=no $DIGITALOCEAN_USER@$DIGITALOCEAN_HOST cd /var/www/api.floreriaenvios.com && pm2 stop api.floreriaenvios.com && pm2 start dist/index.js --name api.floreriaenvios.com"
-
-
+            -   name: 'Deploy to DigitalOcean'
+                uses: appleboy/ssh-action@master
+                with:
+                    host: ${{ secrets.DIGITALOCEAN_IP }}
+                    username: ${{ secrets.DIGITALOCEAN_SSH_USER }}
+                    key: ${{ secrets.DIGITALOCEAN_SSH_KEY }}
+                    script: |
+                        rsync -avz --delete dist/** files images package.json package-lock.json ${{ secrets.DIGITALOCEAN_SSH_USER }}@${{ secrets.DIGITALOCEAN_IP }}:/var/www/html/api.floreriaenvios.com
+                        cd /var/www/html/api.floreriaenvios.com                        
+                        npm install  # Instala las dependencias en tu servidor
+                        pm2 stop
+                        pm2 start server.js --name api.floreriaenvios.com -o out.log -e error.log # Reinicia tu aplicación, asumiendo que usas pm2
 
 
