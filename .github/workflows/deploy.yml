@@ -22,12 +22,23 @@ jobs:
             -   name: 'Run Build'
                 run: npx tsc
 
-            -   name: Transfer files to DigitalOcean
+            -   name: 'Copy files via SSH'
+                env:
+                    DIGITALOCEAN_HOST: ${{ secrets.DIGITALOCEAN_IP }}
+                    DIGITALOCEAN_USER: ${{ secrets.DIGITALOCEAN_SSH_USER }}
+                    SSH_PRIVATE_KEY: ${{ secrets.DIGITALOCEAN_SSH_KEY }}
                 run: |
-                    rsync -avz --delete dist/** package.json package-lock.json ssh ${{ secrets.DIGITALOCEAN_SSH_USER }}@${{ secrets.DIGITALOCEAN_IP }}:/var/www/html/api.floreriaenvios.com
+                    ssh $DIGITALOCEAN_USER@$DIGITALOCEAN_HOST "mkdir -p /var/www/html/api.floreriaenvios.com"
+                    rsync -avz --delete dist/** package.json package-lock.json ssh $DIGITALOCEAN_USER@$DIGITALOCEAN_HOST:/var/www/html/api.floreriaenvios.com
 
-            -   name: Install dependencies and restart server
+
+            -   name: 'Install dependencies on server'
+                env:
+                    DIGITALOCEAN_HOST: ${{ secrets.DIGITALOCEAN_IP }}
+                    DIGITALOCEAN_USER: ${{ secrets.DIGITALOCEAN_SSH_USER }}
                 run: |
-                    ssh ${{ secrets.DIGITALOCEAN_SSH_USER }}@${{ secrets.DIGITALOCEAN_IP }} "cd /var/www/html/api.floreriaenvios.com && npm install && pm2 stop api.floreriaenvios.com && pm2 start server.js --name api.floreriaenvios.com -o out.log -e error.log"
+                    ssh -o StrictHostKeyChecking=no $DIGITALOCEAN_USER@$DIGITALOCEAN_HOST "cd /var/www/html/api.floreriaenvios.com && npm install"
 
-
+            -   name: 'Restart application'
+                run: |
+                    ssh $DIGITALOCEAN_USER@$DIGITALOCEAN_HOST "cd /var/www/html/api.floreriaenvios.com && pm2 stop api.floreriaenvios.com && pm2 start server.js --name api.floreriaenvios.com -o out.log -e error.log"
