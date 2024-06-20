@@ -27,7 +27,7 @@ jobs:
                     DIGITALOCEAN_USERNAME: ${{ secrets.DIGITALOCEAN_USERNAME }}
                     DIGITALOCEAN_PASSWORD: ${{ secrets.DIGITALOCEAN_PASSWORD }}
                 run: |
-                    sshpass -p "$DIGITALOCEAN_PASSWORD" ssh -o StrictHostKeyChecking=no rsync -avz --exclude='*' --include='dist/***' --include='package.json' --include='package-lock.json' --prune-empty-dirs . $DIGITALOCEAN_USERNAME@$DIGITALOCEAN_HOST:/var/www/html/api.floreriaenvios.com
+                    sshpass -p "$DIGITALOCEAN_PASSWORD" ssh -o StrictHostKeyChecking=no rsync -av --exclude='*' --include='dist/***' --include='package.json' --include='package-lock.json' --prune-empty-dirs . $DIGITALOCEAN_USERNAME@$DIGITALOCEAN_HOST:/var/www/html/api.floreriaenvios.com
 
             -   name: 'Install dependencies on server'
                 env:
