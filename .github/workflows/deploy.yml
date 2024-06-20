@@ -37,7 +37,7 @@ jobs:
                 run: |
                     sshpass -p "$DIGITALOCEAN_PASSWORD" ssh $DIGITALOCEAN_USER@$DIGITALOCEAN_HOST "cd /var/www/html/api.floreriaenvios.com && npm install"
 
-            -   name: 'Restart application'
+            -   name: 'Restart application PM2'
                 env:
                     DIGITALOCEAN_HOST: ${{ secrets.DIGITALOCEAN_HOST }}
                     DIGITALOCEAN_USERNAME: ${{ secrets.DIGITALOCEAN_USERNAME }}
