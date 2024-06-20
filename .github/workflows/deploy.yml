@@ -24,7 +24,7 @@ jobs:
 
             -   name: Transfer files to DigitalOcean
                 run: |
-                    rsync -avz --delete dist/** package.json package-lock.json ${{ secrets.DIGITALOCEAN_SSH_USER }}@${{ secrets.DIGITALOCEAN_IP }}:/var/www/html/api.floreriaenvios.com
+                    rsync -avz --delete dist/** package.json package-lock.json ssh ${{ secrets.DIGITALOCEAN_SSH_USER }}@${{ secrets.DIGITALOCEAN_IP }}:/var/www/html/api.floreriaenvios.com
 
             -   name: Install dependencies and restart server
                 run: |
