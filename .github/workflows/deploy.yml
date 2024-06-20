@@ -22,14 +22,12 @@ jobs:
             -   name: 'Run Build'
                 run: npx tsc
 
-            -   name: 'Deploy to DigitalOcean'
-                uses: appleboy/ssh-action@master
-                with:
-                    host: ${{ secrets.DIGITALOCEAN_IP }}
-                    username: ${{ secrets.DIGITALOCEAN_SSH_USER }}
-                    key: ${{ secrets.DIGITALOCEAN_SSH_KEY }}
-                    script: |
-                        rsync -avz --delete dist/** package.json package-lock.json ${{ secrets.DIGITALOCEAN_SSH_USER }}@${{ secrets.DIGITALOCEAN_IP }}:/var/www/html/api.floreriaenvios.com &&
-                        ssh ${{ secrets.DIGITALOCEAN_SSH_USER }}@${{ secrets.DIGITALOCEAN_IP }} "cd /var/www/html/api.floreriaenvios.com && npm install && pm2 stop api.floreriaenvios.com && pm2 start server.js --name api.floreriaenvios.com -o out.log -e error.log"
+            -   name: Transfer files to DigitalOcean
+                run: |
+                    rsync -avz --delete dist/** package.json package-lock.json ${{ secrets.DIGITALOCEAN_SSH_USER }}@${{ secrets.DIGITALOCEAN_IP }}:/var/www/html/api.floreriaenvios.com
+
+            -   name: Install dependencies and restart server
+                run: |
+                    ssh ${{ secrets.DIGITALOCEAN_SSH_USER }}@${{ secrets.DIGITALOCEAN_IP }} "cd /var/www/html/api.floreriaenvios.com && npm install && pm2 stop api.floreriaenvios.com && pm2 start server.js --name api.floreriaenvios.com -o out.log -e error.log"
 
 
