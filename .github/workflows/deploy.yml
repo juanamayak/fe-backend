@@ -40,13 +40,13 @@ jobs:
                 run: |
                     sshpass -p "$DIGITALOCEAN_PASSWORD" ssh -o StrictHostKeyChecking=no $DIGITALOCEAN_USER@$DIGITALOCEAN_HOST "cd /var/www/api.floreriaenvios.com && npm install"
 
-            -   name: Restart application
+            -   name: Restart applicationss
                 env:
                     DIGITALOCEAN_HOST: ${{ secrets.DIGITALOCEAN_HOST }}
                     DIGITALOCEAN_USER: ${{ secrets.DIGITALOCEAN_USER }}
                     DIGITALOCEAN_PASSWORD: ${{ secrets.DIGITALOCEAN_PASSWORD }}
                 run: |
-                    sshpass -p "$DIGITALOCEAN_PASSWORD" ssh -o StrictHostKeyChecking=no $DIGITALOCEAN_USER@$DIGITALOCEAN_HOST cd /var/www/api.floreriaenvios.com && pm2 api.floreriaenvios.com || npx pm2 start dist/index.js --name api.floreriaenvios.com"
+                    sshpass -p "$DIGITALOCEAN_PASSWORD" ssh -o StrictHostKeyChecking=no $DIGITALOCEAN_USER@$DIGITALOCEAN_HOST cd /var/www/api.floreriaenvios.com && pm2 stop api.floreriaenvios.com && pm2 start dist/index.js --name api.floreriaenvios.com"
 
 
 
