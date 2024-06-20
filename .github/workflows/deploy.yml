@@ -16,29 +16,17 @@ jobs:
                 with:
                     node-version: '20'
 
-            -   name: 'Install Dependencies'
-                run: npm install
-
-            -   name: 'Run Build'
-                run: npx tsc
-
-            -   name: 'Copy files via SSH'
-                env:
-                    DIGITALOCEAN_HOST: ${{ secrets.DIGITALOCEAN_IP }}
-                    DIGITALOCEAN_USER: ${{ secrets.DIGITALOCEAN_SSH_USER }}
-                    SSH_PRIVATE_KEY: ${{ secrets.DIGITALOCEAN_SSH_KEY }}
+            -   name: 'Install Dependencies & Build'
                 run: |
-                    ssh $DIGITALOCEAN_USER@$DIGITALOCEAN_HOST "mkdir -p /var/www/html/api.floreriaenvios.com"
-                    rsync -avz --delete dist/** package.json package-lock.json ssh $DIGITALOCEAN_USER@$DIGITALOCEAN_HOST:/var/www/html/api.floreriaenvios.com
+                    npm install
+                    npx tsc
 
-
-            -   name: 'Install dependencies on server'
-                env:
-                    DIGITALOCEAN_HOST: ${{ secrets.DIGITALOCEAN_IP }}
-                    DIGITALOCEAN_USER: ${{ secrets.DIGITALOCEAN_SSH_USER }}
-                run: |
-                    ssh -o StrictHostKeyChecking=no $DIGITALOCEAN_USER@$DIGITALOCEAN_HOST "cd /var/www/html/api.floreriaenvios.com && npm install"
-
-            -   name: 'Restart application'
-                run: |
-                    ssh $DIGITALOCEAN_USER@$DIGITALOCEAN_HOST "cd /var/www/html/api.floreriaenvios.com && pm2 stop api.floreriaenvios.com && pm2 start server.js --name api.floreriaenvios.com -o out.log -e error.log"
+            -   name: Deploy to DigitalOcean
+                uses: appleboy/ssh-action@master
+                with:
+                    host: ${{ secrets.DIGITALOCEAN_HOST }}
+                    username: ${{ secrets.DIGITALOCEAN_USERNAME }}
+                    key: ${{ secrets.DIGITALOCEAN_SSH_KEY }}
+                    port: ${{ secrets.DIGITALOCEAN_PORT }}
+                    script: |
+                        ssh ${{ secrets.DIGITALOCEAN_USERNAME }}@${{ secrets.DIGITALOCEAN_HOST }} -p ${{ secrets.DIGITALOCEAN_PORT }}
