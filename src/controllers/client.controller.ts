@@ -257,11 +257,11 @@ export class ClientController {
 
         if (!clientExists.ok) {
             errors.push({message: 'Se encontraron algunos errores al iniciar la sesión. Por favor, inténtalo de nuevo más tarde o contacta con soporte si el problema persiste.'});
-        } else if (!clientExists.client) {
+        } else if (!clientExists.data) {
             errors.push({message: 'Error al verificar la existencia del usuario.'});
-        } else if (!bcrypt.compareSync(body.password, clientExists.client.password)) {
+        } else if (!bcrypt.compareSync(body.password, clientExists.data.password)) {
             errors.push({message: 'Email o contraseña incorrectos.'});
-        } else if ([0, -2].includes(clientExists.client.status)) {
+        } else if ([0, -2].includes(clientExists.data.status)) {
             errors.push({message: 'Su cuenta aún no ha sido verificada o ha sido dada de baja.'});
         }
 
@@ -275,7 +275,7 @@ export class ClientController {
 
         const data = {
             user_type: 'client',
-            client_id: clientExists.client ? clientExists.client.id.toString() : false
+            client_id: clientExists.data ? clientExists.data.id.toString() : false
         }
 
         /* Creamos el JWT del cliente */
@@ -295,7 +295,7 @@ export class ClientController {
         return res.status(JsonResponse.OK).json({
             ok: true,
             token: JWTCreated ? JWTCreated.token : false,
-            uuid: clientExists.client.uuid
+            uuid: clientExists.data.uuid
         });
     }
 
@@ -366,5 +366,63 @@ export class ClientController {
             ok: true,
             message: 'El usuario se verifico y activo correctamente'
         });
+    }
+
+    public async recoveryPassword(req: Request, res: Response) {
+        // Variables de la funcion
+        const body = req.body
+        const restoreCode = moment().unix()
+        // Contenedor de errores
+        const errors = [];
+
+        // Validacion del request
+        const validatedData = await ClientController.clientValidator.validateRestoreRequest(body)
+
+        if (!validatedData.ok) {
+            return res.status(JsonResponse.BAD_REQUEST).json({
+                ok: false,
+                errors: validatedData.errors
+            })
+        }
+
+        const client = await ClientController.clientQueries.findClientByEmail(body.email)
+
+        if (!client.ok) {
+            return res.status(JsonResponse.BAD_REQUEST).json({
+                ok: false,
+                errors: { message: 'Existen problemas al momento de verificar si el usuario esta dado de alta.' }
+            })
+        } else if (client.data === null) {
+            return res.status(JsonResponse.BAD_REQUEST).json({
+                ok: false,
+                errors: {message: 'El email proporcionado no esta dado de alta en el sistema.'}
+            })
+        }
+
+        const restoreRequest = await ClientController.clientQueries.restoreRequest({
+            restore_password_code: restoreCode,
+            client_id: client.data ? client.data.id : false
+        });
+
+        if (!restoreRequest.ok) {
+            return res.status(JsonResponse.BAD_REQUEST).json({
+                ok: false,
+                errors: { message: 'Existen problemas al momento de realizar la solicitud de restauración de contraseña.' }
+            })
+        }
+
+        const configuration = {
+            subject: 'Restablecer mi contraseña FloreriaEnvios.com',
+            email: body.email,
+            template: 'reset',
+            code: restoreCode
+        }
+
+        const sendEmail = await ClientController.mailer.send(configuration);
+
+        return res.status(JsonResponse.OK).json({
+            ok: true,
+            message: 'Se ha enviado los pasos a seguir para restablecer su contraseña al correo proporcionado'
+        })
     }
 }

@@ -73,12 +73,28 @@ export class ClientQueries {
 
     public async findClientByEmail(email) {
         try {
-            const client = await ClientModel.findOne({
+            const data = await ClientModel.findOne({
                 where: {
                     email
                 }
             });
-            return {ok: true, client}
+            return {ok: true, data}
+        } catch (e) {
+            console.log(e)
+            return {ok: false}
+        }
+    }
+
+    public async restoreRequest(body: any) {
+        try {
+            const data = await ClientModel.update({
+                restore_password_code: body.restore_password_code
+            }, {
+                where: {
+                    id: body.client_id
+                }
+            })
+            return {ok: true, data}
         } catch (e) {
             console.log(e)
             return {ok: false}

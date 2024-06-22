@@ -55,6 +55,7 @@ export class Routes {
         app.route('/api/clients/update/:uuid').post(this.clientController.update);
         app.route('/api/clients/update/address/:uuid').post(this.clientController.addressUpdate);
         app.route('/api/clients/verify/:uuid/:code').get(this.clientController.verify);
+        app.route('/api/clients/recovery/password').post(this.clientController.recoveryPassword);
 
         /* RUTAS DE CATEGORIAS */
         app.route('/api/categories/:uuid').get(this.categoryController.show);

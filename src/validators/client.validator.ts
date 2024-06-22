@@ -204,4 +204,37 @@ export class ClientValidator {
             }
         }
     }
+
+    public async validateRestoreRequest(body: any) {
+        // Contenedor de errores
+        const errors = []
+        try {
+
+            const email: string = (body.email == null || validator.isEmpty(body.email + '')) ?
+                errors.push({message: 'Favor de proporcionar su correo electrónico'}) : body.email
+
+            if (validator.isEmail(email) === false) {
+                errors.push({ message: 'Favor de respetar la nomenclatura del email.' })
+            }
+
+            if (errors.length > 0) {
+                return {
+                    ok: false,
+                    errors
+                }
+            }
+
+            return {
+                ok: true
+            }
+
+        } catch (e) {
+            console.log(e)
+            errors.push({message: 'Error al validar los datos proporcionados'})
+            return {
+                ok: false,
+                errors
+            }
+        }
+    }
 }
