@@ -10,6 +10,7 @@ export class ProductModel extends Model {
     public price: string;
     public sku: string;
     public discount_percent: string;
+    public total_sold: string;
     public description: string;
     public status: number;
     public createdAt: string;
@@ -29,6 +30,7 @@ ProductModel.init({
     price: {type: DataTypes.DECIMAL},
     sku: {type: DataTypes.STRING},
     discount_percent: {type: DataTypes.STRING},
+    total_sold: {type: DataTypes.STRING},
     description: {type: DataTypes.STRING},
     status: {type: DataTypes.INTEGER},
     createdAt: {

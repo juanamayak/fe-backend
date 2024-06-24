@@ -92,6 +92,7 @@ export class Routes {
         app.route('/api/products/delete/:uuid').post(this.productController.delete);
         app.route('/api/products/images/:uuid').get(this.productController.images);
         app.route('/api/products/category/:category_uuid').get(this.productController.productsByCategory);
+        app.route('/api/products/report/top-selling-products').get(this.productController.getTopSellingProducts);
 
         /* RUTAS DE PROVEEDORES  */
         app.route('/api/providers').get(this.providerController.index);
@@ -112,8 +113,6 @@ export class Routes {
         app.route('/api/dedications/update/:uuid').post(this.messagesController.update);
         app.route('/api/dedications/delete/:uuid').put(this.messagesController.delete);
 
-        // RUTAS DE COSTOS DE ENVÍO
-
         // RUTAS DE CARRITO DE COMPRAS
         app.route('/api/cart').get(CheckHeaders.validateJWTClient, this.cartController.show);
         app.route('/api/cart/create').post(CheckHeaders.validateJWTClient, this.cartController.store);
@@ -128,6 +127,7 @@ export class Routes {
         app.route('/api/orders/index/clients').get(CheckHeaders.validateJWTClient, this.ordersController.clientsIndex);
         app.route('/api/orders/create').post(CheckHeaders.validateJWTClient, this.ordersController.store);
         app.route('/api/orders/update/:uuid').put(CheckHeaders.validateJWTClient, this.ordersController.update);
+
 
         // RUTAS DE PAYMENTS
         app.route('/api/payment/:orderId').get(this.paymentController.getPaymentByOrder);
@@ -146,6 +146,9 @@ export class Routes {
 
         // RUTAS DE MENSAJES
         app.route('/api/messages').get(this.messagesController.index);
+
+        // RUTAS DE REPORTES
+
 
     }
 }

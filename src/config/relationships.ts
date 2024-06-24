@@ -9,20 +9,16 @@ import {AddressModel} from "../models/address.model";
 import {ClientModel} from "../models/client.model";
 import {CartModel} from "../models/cart.model";
 import {CitySuggestionModel} from "../models/city_suggestion.model";
-import {ClientOrderCouponModel} from "../models/client_order_coupon.mode";
 import {OrderModel} from "../models/order.model";
 import {CouponModel} from "../models/coupons.model";
 import {ProductModel} from "../models/product.model";
-import {PaymentMethodModel} from "../models/payment_method.model";
 import {CategoryModel} from "../models/category.model";
 import {SubcategoryModel} from "../models/subcategory.model";
 import {ProviderModel} from "../models/provider.model";
 import {ImageModel} from "../models/image.model";
 import {ProductProviderModel} from "../models/product_provider.model";
-import {CartProductModel} from "../models/cart_product.model";
-import {OrderController} from "../controllers/order.controller";
-import {PaymentModel} from "../models/payment.model";
 import {DeliveryHourModel} from "../models/delivery_hour.model";
+import {OrderProductModel} from "../models/order_product.model";
 
 export default class Relationship {
     static init() {
@@ -52,6 +48,9 @@ export default class Relationship {
             otherKey: 'product_id'
 
         });
+
+        ProductModel.hasMany(OrderProductModel, { foreignKey: 'product_id' });
+        OrderProductModel.belongsTo(ProductModel, { foreignKey: 'product_id', as: 'product' });
 
         ProductModel.hasMany(ImageModel, {
             foreignKey: 'imageable_id',

@@ -1,4 +1,4 @@
-import {Op} from 'sequelize'
+import sequelize, {Op} from 'sequelize'
 import {ProductModel} from "../models/product.model";
 import {SubcategoryModel} from "../models/subcategory.model";
 import {ProviderModel} from "../models/provider.model";
@@ -6,6 +6,7 @@ import {ImageModel} from "../models/image.model";
 import {ProductProviderModel} from "../models/product_provider.model";
 import {CategoryModel} from "../models/category.model";
 import {CartModel} from "../models/cart.model";
+import {OrderProductModel} from "../models/order_product.model";
 
 export class ProductQueries {
 
@@ -105,6 +106,27 @@ export class ProductQueries {
                     attributes: ['id', 'uuid', 'sku', 'name', 'description', 'price', 'discount_percent', 'status']
                 });
             return {ok: true, products}
+        } catch (e) {
+            console.log(e)
+            return {ok: false}
+        }
+    }
+
+    public async getTopSellingProducts() {
+        try {
+            let data = await ProductModel.findAll({
+                attributes: [
+                    'id',
+                    'name',
+                    'price',
+                    [sequelize.literal('(SELECT SUM(`quantity`) FROM `order_product` WHERE `order_product`.`product_id` = `ProductModel`.`id`)'), 'total_sold']
+                ],
+                group: ['ProductModel.id'],
+                order: [[sequelize.literal('total_sold'), 'DESC']],
+                limit: 4
+            });
+
+            return {ok: true, data}
         } catch (e) {
             console.log(e)
             return {ok: false}

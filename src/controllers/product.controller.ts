@@ -16,9 +16,10 @@ import {ProviderQueries} from "../queries/provider.queries";
 import {ProductProviderQueries} from "../queries/product_provider.queries";
 import {ImageQueries} from "../queries/image.queries";
 import {ProductSubcategoryQueries} from "../queries/product_subcategory.queries";
-import {random, randomInt} from "mathjs";
+import {im, random, randomInt} from "mathjs";
 import sequelize from "sequelize";
 import {database} from "../config/database";
+import {OrderProductQueries} from "../queries/order_product.queries";
 
 export class ProductController {
 
@@ -27,6 +28,7 @@ export class ProductController {
     static productProviderQueries: ProductProviderQueries = new ProductProviderQueries();
     static productSubcategoryQueries: ProductSubcategoryQueries = new ProductSubcategoryQueries();
     static productQueries: ProductQueries = new ProductQueries();
+    static orderProductQueries: OrderProductQueries = new OrderProductQueries();
     static categoryQueries: CategoryQueries = new CategoryQueries();
     static providerQueries: ProviderQueries = new ProviderQueries();
     static imageQueries: ImageQueries = new ImageQueries();
@@ -477,6 +479,61 @@ export class ProductController {
         });
     }
 
+    public async getTopSellingProducts(req: Request, res: Response) {
+        const errors = [];
+
+        const products = await ProductController.productQueries.getTopSellingProducts();
+
+        if (!products.ok) {
+            errors.push({message: 'Existen problema al buscar la categoria solicitada'});
+        } else if (!products.data) {
+            errors.push({message: 'La categoria no se encuentra dada de alta'});
+        }
+
+        let tempProductsData: any;
+        let productsWithImages = [];
+        for (const product of products.data) {
+
+            const image = await ProductController.imageQueries.productImage({
+                imageable_id: product.id
+            });
+
+            if (!image.ok) {
+                return res.status(JsonResponse.BAD_REQUEST).json({
+                    ok: false,
+                    errors: [{message: "Existen problemas al momento de obtener la imagen del producto"}]
+                })
+            }
+
+            let downloadedImages: any;
+            if (image.image) {
+                downloadedImages = await ProductController.downloadImages(image.image);
+
+                if (!downloadedImages.ok) {
+                    return res.status(JsonResponse.BAD_REQUEST).json({
+                        ok: false,
+                        errors: downloadedImages.errors
+                    })
+                }
+            }
+
+            tempProductsData = {
+                id: product.id,
+                name: product.name,
+                price: product.price,
+                total_sold: product['total_sold'],
+                image: downloadedImages ? downloadedImages.image : null
+            }
+
+            productsWithImages.push(tempProductsData);
+        }
+
+        return res.status(JsonResponse.OK).json({
+            ok: true,
+            products: productsWithImages
+        });
+    }
+
     public async images(req: Request, res: Response) {
         const errors = [];
 
@@ -633,4 +690,6 @@ export class ProductController {
             }
         }
     }
+
+
 }
