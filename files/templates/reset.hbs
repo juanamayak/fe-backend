@@ -1,93 +1,62 @@
-<!DOCTYPE html
-    PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-
-<html xmlns="http://www.w3.org/1999/xhtml">
-
+<html lang="es">
 <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-    <title>Correo para restablecer cuenta</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 </head>
+<body>
+<div style="background-color: #e2e8f0; font-family: Arial, sans-serif;">
+    <div style="margin: auto; display: block; width: 100%; max-width: 42rem;">
+        <!-- Imagen inicial -->
+        <div style="max-width: 100%; background-color: #f2999b; padding: 0.75rem;">
+            <img style="margin: auto; display:block; width: 7rem;" src="https://floreriaenvios.com/public/logotipo.png">
+        </div>
+        <!-- Imagen inicial -->
 
-<body style="margin: 0; padding: 0;">
-    <table align="center" border="1" cellpadding="0" cellspacing="0" width="600">
-        <tr>
-            <td align="center" bgcolor="#fff" style="padding: 10px 0 10px 0;">
-                <img src="http://74.208.251.17/tys/public/syitgov.jpg"
-                    alt="Logo municipal" width="20%" style="display: block;" />
-            </td>
-        </tr>
-        <tr>
-            <td bgcolor="#ffffff" style="padding: 40px 30px 40px 30px;">
-                <table border="1" cellpadding="0" cellspacing="0" width="100%">
-                    <tr align="center">
-                        <td><strong>Restablecer mi contraseña</strong></td>
-                    </tr>
-                </table>
-                <table border="1" cellpadding="0" cellspacing="0" width="100%">
-                    <tr>
-                        <td width="260" valign="top">
-                            <table border="0" cellpadding="0" cellspacing="0" width="100%">
-                                <tr align="center">
-                                    <td><strong>En la aplicación móvil</strong></td>
-                                </tr>
-                                <tr>
-                                    <td align="center">
-                                        <img src="http://74.208.251.17/tys/public/movil.png" alt="" width="50%"
-                                            height="140" style="display: block;" />
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td align="center" style="padding: 10px 0 0 0;">
-                                        Si desea restablecer su contraseña por medio de la aplicación móvil, favor
-                                        de iniciar sesión y proporcionar el siguiente código:
-                                        {{data.restablecer_password}}
-                                    </td>
-                                </tr>
-                            </table>
-                        </td>
-                        <td width="260" valign="top">
-                            <table border="0" cellpadding="0" cellspacing="0" width="100%">
-                                <tr align="center">
-                                    <td><strong>En la aplicación web</strong></td>
-                                </tr>
-                                <tr>
-                                    <td align="center">
-                                        <img src="http://74.208.251.17/tys/public/computadora.png" alt="" width="50%"
-                                            height="140" style="display: block;" />
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td align="center" style="padding: 10px 0 0 0;">
-                                        Si desea restablecer su contraseña por medio de nuestra plataforma web, favor
-                                        de entrar al siguiente enlace:
-                                        <br>
-                                        <a target="_blank"
-                                            href="{{data.plataforma}}usuario/restablecer/{{data.restablecer_password}}">
-                                            Restablecer contraseña
-                                        </a>
-                                    </td>
-                                </tr>
-                            </table>
-                        </td>
-                    </tr>
-                </table>
-            </td>
-        </tr>
-        <tr>
-            <td bgcolor="#fff">
-                <p align="center" style="color: #000;">
-                    Av. 20 Norte entre Calles 8 y 10 Norte. Col. Centro.
-                    <br>
-                    Solidaridad. Q. Roo. C.P. 77710
-                    <br>
-                    Tel: (984) 877 3050
-                    <br>
-                    contacto@gobiernodesolidaridad.gob.mx
+        <!-- Contenido principal -->
+        <div style="max-width: 100%; background-color: #ffffff; padding: 5%;">
+            <h1 style="font-weight: bold; font-size: 1.25rem;">¡Recupera tu contraseña!</h1>
+            <p>Hola, {{ data.client }}</p>
+
+            <p>Solicitaste recuperar tu contraseña.</p>
+            <p>
+                Para recuperar tu contraseña has clic en el siguiente botón y sigue los pasos o bien copia y pega el enlace en tu navegador web.
+            </p>
+
+            <div style="width: 100%; margin: auto; display: block; text-align: center;">
+                <a type="button"
+                   href="https://floreriaenvios.com/usuarios/restaurar-contrasena/{{ data.token }}"
+                   target="_blank"
+                   style="width: 50%; color: white; background-color: #f2999b; border-radius: 0.5rem; font-size: 0.875rem; padding: 0.625rem 1.25rem; margin-bottom: 0.5rem;">
+                    Restablecer contraseña
+                </a>
+                <p style="font-size: 0.875rem;">
+                    <a style="color: #2563eb; text-decoration: underline;" href="">https://floreriaenvios.com/usuarios/restaurar-contrasena/{{ data.token }}</a>
                 </p>
-            </td>
-        </tr>
-    </table>
-</body>
+            </div>
 
+            <p>Si tienes alguna otra duda, no dudes en comunicarte con nosotros, estamos para servirte.</p>
+            <p style="margin-bottom: 3.125rem;"><i>Atentamente:</i><br>Equipo de FloreriaEnvios</p>
+
+        </div>
+        <!-- Contenido principal -->
+
+        <!-- Footer -->
+        <div style="max-width: 100%; background-color: #475569; padding: 1.25rem; text-align: center; color: white;">
+            <div>
+                <h4 style="font-size: 1rem; font-weight: 600;">Soporte</h4>
+                <p>
+                    Comunícate con nosotros por los siguientes medios:<br>
+                    Correo: <a style="color: #f2999b;" href="mailto:proyectos@pretwor.com">soporte@floreriaenvios.com</a><br>
+                    Whatsapp: <a style="color: #f2999b;" href="https://wa.me/573224294332">+52 984 123 45 67</a><br>
+                </p>
+            </div>
+            <p>
+                &copy; FloreriaEnvios.com. Todos los derechos reservados.
+            </p>
+        </div>
+        <!-- Footer -->
+    </div>
+</div>
+</body>
 </html>

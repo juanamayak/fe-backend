@@ -100,7 +100,7 @@ export class ClientController {
         if (!clientCreated.ok) {
             return res.status(JsonResponse.BAD_REQUEST).json({
                 ok: false,
-                errors: [{ message: "Existen problemas al momento de dar de alta su cuenta. Intente más tarde."}]
+                errors: [{message: "Existen problemas al momento de dar de alta su cuenta. Intente más tarde."}]
             });
         }
 
@@ -299,7 +299,7 @@ export class ClientController {
         });
     }
 
-    public async verify(req: Request, res: Response){
+    public async verify(req: Request, res: Response) {
         const body = req.body;
         const errors = [];
 
@@ -390,7 +390,7 @@ export class ClientController {
         if (!client.ok) {
             return res.status(JsonResponse.BAD_REQUEST).json({
                 ok: false,
-                errors: { message: 'Existen problemas al momento de verificar si el usuario esta dado de alta.' }
+                errors: {message: 'Existen problemas al momento de verificar si el usuario esta dado de alta.'}
             })
         } else if (client.data === null) {
             return res.status(JsonResponse.BAD_REQUEST).json({
@@ -407,15 +407,18 @@ export class ClientController {
         if (!restoreRequest.ok) {
             return res.status(JsonResponse.BAD_REQUEST).json({
                 ok: false,
-                errors: { message: 'Existen problemas al momento de realizar la solicitud de restauración de contraseña.' }
+                errors: {message: 'Existen problemas al momento de realizar la solicitud de restauración de contraseña.'}
             })
         }
+
+        const codeUuid = {code: restoreCode, uuid: client.data.uuid};
 
         const configuration = {
             subject: 'Restablecer mi contraseña FloreriaEnvios.com',
             email: body.email,
             template: 'reset',
-            code: restoreCode
+            client: `${client.data.name} ${client.data.lastname}`,
+            token: btoa(JSON.stringify(codeUuid))
         }
 
         const sendEmail = await ClientController.mailer.send(configuration);
@@ -423,6 +426,54 @@ export class ClientController {
         return res.status(JsonResponse.OK).json({
             ok: true,
             message: 'Se ha enviado los pasos a seguir para restablecer su contraseña al correo proporcionado'
+        })
+    }
+
+    public async restorePassword(req: Request, res: Response) {
+        // Variables de la funcion
+        const body = req.body
+        // Contenedor de errores
+        const errors = [];
+
+        // Validacion del request
+        const validatedData = await ClientController.clientValidator.validateRestorePassword(body)
+
+        if (!validatedData.ok) {
+            return res.status(JsonResponse.BAD_REQUEST).json({
+                ok: false,
+                errors: validatedData.errors
+            })
+        }
+
+        const findUserByRestoreCode = await ClientController.clientQueries.findUserByRestoreCode(body.code);
+
+        if (!findUserByRestoreCode.ok) {
+            return res.status(JsonResponse.BAD_REQUEST).json({
+                ok: false,
+                errors: [{message: 'Existen problemas al momento de verificar si el código esta dado de alta.'}]
+            })
+        } else if (findUserByRestoreCode.data == null) {
+            return res.status(JsonResponse.BAD_REQUEST).json({
+                ok: false,
+                errors: [{message: 'El código proporcionado no se encuentra dado de alta en el sistema.'}]
+            })
+        }
+
+        const changePassword = await ClientController.clientQueries.updatePassword({
+            password: bcrypt.hashSync(body.password, ClientController.salt),
+            id: findUserByRestoreCode.data ? findUserByRestoreCode.data.id : false
+        })
+
+        if (!changePassword.ok) {
+            return res.status(JsonResponse.BAD_REQUEST).json({
+                ok: false,
+                errors: [{message: 'Existen problemas al momento de cambiar su contraseña.'}]
+            })
+        }
+
+        return res.status(JsonResponse.OK).json({
+            ok: true,
+            message: 'Se ha cambiado su contraseña de forma correcta'
         })
     }
 }

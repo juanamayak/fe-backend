@@ -237,4 +237,50 @@ export class ClientValidator {
             }
         }
     }
+
+    public async validateRestorePassword(body: any) {
+        // Contenedor de errores
+        const errors = []
+        try {
+
+            const uuid: string = (body.uuid == null || validator.isEmpty(body.uuid)) ?
+                errors.push({ message: 'El usuario es obligatorio' }) : body.uuid;
+
+            const code: string = body.code == null ?
+                errors.push({ message: 'El código de restauración es obligatorio' }) : body.code;
+
+            const password: string = (body.password == null || validator.isEmpty(body.password)) ?
+                errors.push({message: 'Favor de proporcionar su contraseña'}) : body.password
+
+            const confirm_password: string = (body.confirm_password == null || validator.isEmpty(body.confirm_password)) ?
+                errors.push({message: 'Favor de confirmar su contraseña'}) : body.confirm_password
+
+            if ((Array.from(password).length < 5)) {
+                errors.push({ message: 'La contraseña debe tener al menos 5 dígitos' })
+            }
+
+            if (password !== confirm_password) {
+                errors.push({ message: 'La contraseñas proporcionadas no coinciden' })
+            }
+
+            if (errors.length > 0) {
+                return {
+                    ok: false,
+                    errors
+                }
+            }
+
+            return {
+                ok: true
+            }
+
+        } catch (e) {
+            console.log(e)
+            errors.push({message: 'Error al validar los datos proporcionados'})
+            return {
+                ok: false,
+                errors
+            }
+        }
+    }
 }

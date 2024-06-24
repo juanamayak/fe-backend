@@ -85,6 +85,20 @@ export class ClientQueries {
         }
     }
 
+    public async findUserByRestoreCode(code: any) {
+        try {
+            const data = await ClientModel.findOne({
+                where: {
+                    restore_password_code: code
+                }
+            });
+            return {ok: true, data}
+        } catch (e) {
+            console.log(e)
+            return {ok: false}
+        }
+    }
+
     public async restoreRequest(body: any) {
         try {
             const data = await ClientModel.update({
@@ -95,6 +109,23 @@ export class ClientQueries {
                 }
             })
             return {ok: true, data}
+        } catch (e) {
+            console.log(e)
+            return {ok: false}
+        }
+    }
+
+    public async updatePassword(data: any) {
+        try {
+            const user = await ClientModel.update({
+                password: data.password,
+                restore_password_code: null,
+            }, {
+                where: {
+                    id: data.id
+                }
+            })
+            return {ok: true, user}
         } catch (e) {
             console.log(e)
             return {ok: false}

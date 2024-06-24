@@ -15,7 +15,7 @@ export class Payload {
                 privateKey = fs.readFileSync('./src/keys/private.pem', 'utf8')
             }
 
-            const cryptr = new Cryptr(process.env.CRYPTR_KEY || '')
+            const cryptr = new Cryptr(process.env.CRYPTR_KEY);
 
             if (data.user_type === 'client') {
                 const userId = cryptr.encrypt((data.client_id));

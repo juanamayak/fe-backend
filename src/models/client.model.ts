@@ -22,6 +22,7 @@ export class ClientModel extends Model {
     public account_verified: string;
     public facebook_id: string;
     public facebook_token: string;
+    public restore_password_code: number;
     public status: number;
     public createdAt: string;
     public updatedAt: string;
@@ -89,6 +90,9 @@ ClientModel.init({
     },
     facebook_token: {
         type: DataTypes.TEXT
+    },
+    restore_password_code: {
+        type: DataTypes.STRING
     },
     status: {
         type: DataTypes.INTEGER
