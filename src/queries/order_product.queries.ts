@@ -10,4 +10,14 @@ import {ProductModel} from "../models/product.model";
 export class OrderProductQueries {
 
 
+    public async create(body) {
+        try {
+            let data = await OrderProductModel.create(body);
+            return {ok: true, data}
+        } catch (e) {
+            console.log(e)
+            return {ok: false}
+        }
+    }
+
 }
