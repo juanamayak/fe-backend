@@ -1,6 +1,5 @@
 /node_modules
 /dist
 /files
-/src/certificates
 .idea/
 .env
