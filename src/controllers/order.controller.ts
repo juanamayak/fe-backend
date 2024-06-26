@@ -235,7 +235,6 @@ export class OrderController {
             message: body.message,
             sign: body.sign,
             status: 1 // pendiente
-
         }
 
         const updatedOrder = await OrderController.ordersQueries.update(order.data.id, data);
@@ -257,12 +256,15 @@ export class OrderController {
         });
     }
 
-    /*public async delete(req: Request, res: Response) {
+    public async changeStatus(req: Request, res: Response) {
         const body = req.body;
         const errors = [];
 
-        const addressUuid = !req.params.uuid || validator.isEmpty(req.params.uuid) ?
-            errors.push({message: 'Favor de proporcionar la dirección.'}) : req.params.uuid
+        const orderUuid = !req.params.uuid || validator.isEmpty(req.params.uuid) ?
+            errors.push({message: 'Favor de proporcionar la orden'}) : req.params.uuid;
+
+        const status: string = !body.status || validator.isEmpty(body.status) ?
+            errors.push({message: 'El estatus es obligatorio'}) : body.status;
 
         if (errors.length > 0) {
             return res.status(JsonResponse.BAD_REQUEST).json({
@@ -271,14 +273,14 @@ export class OrderController {
             });
         }
 
-        const findedAdress = await OrderController.addressesQueries.show({
-            uuid: addressUuid
+        const order = await OrderController.ordersQueries.show({
+            uuid: orderUuid
         });
 
-        if (!findedAdress.ok) {
-            errors.push({message: 'Existen problema al buscar el registro solicitado'});
-        } else if (!findedAdress.address) {
-            errors.push({message: 'El registro no se encuentra dada de alta'});
+        if (!order.ok) {
+            errors.push({message: 'Existen problemas al buscar el registro solicitado'});
+        } else if (!order.data) {
+            errors.push({message: 'El registro no se encuentra dado de alta'});
         }
 
         if (errors.length > 0) {
@@ -288,10 +290,10 @@ export class OrderController {
             });
         }
 
-        const deletedAddress = await OrderController.addressesQueries.delete(findedAdress.address.id, { status: body.status});
+        const updatedOrder = await OrderController.ordersQueries.update(order.data.id, body);
 
-        if (!deletedAddress.ok) {
-            errors.push({message: 'Existen problemas al momento de eliminar el registro. Intente de nuevamente'});
+        if (!updatedOrder.data) {
+            errors.push({message: 'Se encontro un problema a la hora de actualizar la orden. Intente de nuevamente'});
         }
 
         if (errors.length > 0) {
@@ -303,44 +305,7 @@ export class OrderController {
 
         return res.status(JsonResponse.OK).json({
             ok: true,
-            message: 'El registro se elimino correctamente.'
+            message: 'El estatus de la orden se cambio exitosamente'
         });
-    }*/
-
-    private static async downloadImages(images: any) {
-        try {
-            const base64Images = []
-            if(Array.isArray(images)) {
-                for (const image of images) {
-                    const downloadedImage = await OrderController.file.download(image, 'product')
-
-                    if (!downloadedImage.ok) {
-                        return {
-                            ok: false,
-                            errors: [{message: "Existen problemas al momento de obtener el archivo."}]
-                        }
-                    }
-
-                    base64Images.push(downloadedImage.image)
-                }
-                return {ok: true, base64Images}
-            } else {
-                const downloadedImage = await OrderController.file.download(images, 'product')
-                if (!downloadedImage.ok) {
-                    return {
-                        ok: false,
-                        errors: [{message: "Existen problemas al momento de obtener el archivo."}]
-                    }
-                }
-
-                return {ok: true, image: downloadedImage.image}
-            }
-        } catch (e) {
-            console.log(e)
-            return {
-                ok: false,
-                errors: [{message: "Existen problemas al momento de obtener los archivos de la evidencia."}]
-            }
-        }
     }
 }

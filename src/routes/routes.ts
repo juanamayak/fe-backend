@@ -127,6 +127,7 @@ export class Routes {
         app.route('/api/orders/index/clients').get(CheckHeaders.validateJWTClient, this.ordersController.clientsIndex);
         app.route('/api/orders/create').post(CheckHeaders.validateJWTClient, this.ordersController.store);
         app.route('/api/orders/update/:uuid').put(CheckHeaders.validateJWTClient, this.ordersController.update);
+        app.route('/api/orders/change-status/:uuid').put(CheckHeaders.validateJWTUser, this.ordersController.changeStatus);
 
 
         // RUTAS DE PAYMENTS
