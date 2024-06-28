@@ -2,7 +2,6 @@ import nodemailer from 'nodemailer';
 import hbs from 'nodemailer-express-handlebars';
 import path from 'path';
 import moment from 'moment'
-import * as process from "node:process";
 
 export class Mailer {
 
@@ -23,11 +22,11 @@ export class Mailer {
         this.hbsConfig = {
             viewEngine: {
                 extName: '.hbs',
-                partialsDir: path.join(__dirname, process.env.TEMPLATE_FILES),
-                layoutsDir: path.join(__dirname, process.env.TEMPLATE_FILES),
+                partialsDir: path.join(__dirname, '../files/templates/'),
+                layoutsDir: path.join(__dirname, '../files/templates/'),
                 defaultLayout: ''
             },
-            viewPath: path.join(__dirname, process.env.TEMPLATE_FILES),
+            viewPath: path.join(__dirname, '../files/templates/'),
             extName: '.hbs'
         };
     }
